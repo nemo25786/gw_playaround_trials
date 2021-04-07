@@ -1,0 +1,6 @@
+[submodule "ccst_config_reader"]
+	path = ccst_config_reader
+	url = git@github.com:rnd-hub/ccst_config_reader.git
+[submodule "GrafanaSnapshot"]
+	path = GrafanaSnapshot
+	url = git@github.com:rnd-hub/GrafanaSnapshot.git
