@@ -31,6 +31,9 @@ class LayerManagerValidationClient(object):
     def check_add_layer_valid(self):
         return self.__check_valid(endpoint="/layers", method="post")
 
+    def check_add_layer_valid_wo_entities(self):
+        return self.__check_valid_wo_entities(endpoint="/layers", method="post")
+
     def check_add_layer_invalid(self):
         return self.__check_invalid(endpoint="/layers", method="post")
 
@@ -70,7 +73,23 @@ class LayerManagerValidationClient(object):
         if openapi_endpoint is None:
             openapi_endpoint = endpoint
 
-        request_object = self.generator.get_invalid_request_object(endpoint=openapi_endpoint, method=method)
+        request_object = self.generator.get_full_request_object(endpoint=openapi_endpoint, method=method)
+        response = FUNC_ptr_DICT[method](url=urljoin(self.endpoint, endpoint[1:]), headers=self.headers,
+                                         request_json=request_object, log=self.log)
+
+        try:
+            RestUtils.is_response_ok(response.status_code)
+        except Exception as e:
+            self.log.warning(f"did not receive status code ok, instead got {e}")
+            return False
+        else:
+            return True
+
+    def __check_valid_wo_entities(self, endpoint, method, openapi_endpoint=None):
+        if openapi_endpoint is None:
+            openapi_endpoint = endpoint
+
+        request_object = self.generator.get_full_request_object(endpoint=openapi_endpoint, method=method, remove={"entities", "createdAt", "updatedAt"})
         response = FUNC_ptr_DICT[method](url=urljoin(self.endpoint, endpoint[1:]), headers=self.headers,
                                          request_json=request_object, log=self.log)
 
@@ -118,6 +137,8 @@ class LayerManagerValidationClient(object):
         else:
             self.log.warning(f"did not receive status code not ok")
             return False
+
+
 
     def __check_invalid_all_combinations(self, endpoint, method, openapi_endpoint=None):
         if openapi_endpoint is None:
