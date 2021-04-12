@@ -13,6 +13,8 @@ import logging
 from GrafanaSnapshot import SnapshotFace
 from jsonformatter import JsonFormatter
 
+from logic.Layer_manager_server_REST.layers_manager import LayersManager
+
 ZAPI_TEST_STATUS = {
              "pass": {"id": 1},
              "fail": {"id": 2},
@@ -139,3 +141,34 @@ def check_connect_to_server(get_function_name, get_log, get_config, server):
     response = improved_get(log=get_log, url=get_config["SERVICES"][server], params={})
 
     assert response.status_code != requests.codes.not_found
+
+@pytest.fixture(scope="function", autouse=False)
+def layer_manager_client(server, get_config):
+    layer_manager_client = LayersManager(base_url=get_config["SERVICES"][server])
+
+    yield layer_manager_client
+
+    layer_manager_client.close()
+
+@pytest.fixture(scope="function", autouse=False)
+def delete_db(layer_manager_client, get_log):
+    try:
+        layers = layer_manager_client.layers.get()
+    except Exception as e:
+        get_log.warning(f"unable to delete db with msg {str(e)}")
+    else:
+         if layers is None:
+             get_log.warning(f"unable to delete db")
+
+    for layer in layers:
+        resp = layer_manager_client.layers.layer_id_delete(layer.id)
+
+        if resp is None:
+            get_log.warning(f"unable to delete layer {layer.id}:{layer.name} from db")
+
+    layers = layer_manager_client.layers.get()
+
+    if len(layers) != 0:
+        get_log.warning("could not empty entire db...")
+
+
