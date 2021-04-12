@@ -52,6 +52,20 @@ class LayerManagerValidationClient(object):
     def check_add_entity_to_layer_invalid(self):
         return self.__check_invalid(endpoint="/layers/string/entities", method="post", openapi_endpoint="/layers/{layerId}/entities")
 
+    def check_change_entity_valid(self):
+        return self.__check_valid(endpoint="/layers/string/entities/string", method="put", openapi_endpoint="/layers/{layerId}/entities/{entityId}")
+
+    def check_change_entity_invalid(self):
+        return self.__check_invalid(endpoint="/layers/string/entities/string", method="put", openapi_endpoint="/layers/{layerId}/entities/{entityId}")
+
+    def check_change_entity_invalid_all_combinations(self):
+        return self.__check_invalid_all_combinations(endpoint="/layers/string/entities/string", method="put",
+                                    openapi_endpoint="/layers/{layerId}/entities/{entityId}")
+
+    def check_change_entity_valid_all_combinations(self):
+        return self.__check_valid_all_combinations(endpoint="/layers/string/entities/string", method="put",
+                                    openapi_endpoint="/layers/{layerId}/entities/{entityId}")
+
     def __check_valid(self, endpoint, method, openapi_endpoint=None):
         if openapi_endpoint is None:
             openapi_endpoint = endpoint
@@ -67,6 +81,26 @@ class LayerManagerValidationClient(object):
             return False
         else:
             return True
+
+    def __check_valid_all_combinations(self, endpoint, method, openapi_endpoint=None):
+        if openapi_endpoint is None:
+            openapi_endpoint = endpoint
+
+        request_objects = self.generator.get_all_possible_request_objects(endpoint=openapi_endpoint, method=method)
+
+        for request_object in request_objects:
+            response = FUNC_ptr_DICT[method](url=urljoin(self.endpoint, endpoint[1:]), headers=self.headers,
+                                             request_json=request_object, log=self.log)
+
+            try:
+                RestUtils.is_response_ok(response.status_code)
+            except Exception as e:
+                self.log.warning(f"did not receive status code ok, instead got {e}")
+                return False
+            else:
+                continue
+
+        return True
 
     def __check_invalid(self, endpoint, method, openapi_endpoint=None):
         if openapi_endpoint is None:
@@ -85,7 +119,26 @@ class LayerManagerValidationClient(object):
             self.log.warning(f"did not receive status code not ok")
             return False
 
+    def __check_invalid_all_combinations(self, endpoint, method, openapi_endpoint=None):
+        if openapi_endpoint is None:
+            openapi_endpoint = endpoint
 
+        request_objects = self.generator.get_invalid_request_object(endpoint=openapi_endpoint, method=method)
+
+        for request_object in request_objects:
+            response = FUNC_ptr_DICT[method](url=urljoin(self.endpoint, endpoint[1:]), headers=self.headers,
+                                         request_json=request_object, log=self.log)
+
+            try:
+                RestUtils.is_response_ok(response.status_code)
+            except Exception as e:
+                continue
+
+            else:
+                self.log.warning(f"did not receive status code not ok")
+                return False
+
+        return True
 
     # def check_add_layer_valid(self):
     #     request_object = self.generator.get_full_request_object(endpoint="/layers", method="post")

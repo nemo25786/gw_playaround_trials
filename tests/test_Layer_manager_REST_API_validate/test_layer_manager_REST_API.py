@@ -47,3 +47,25 @@ def test_add_entity_to_layer(get_function_name, get_log, get_config, server, get
 
     assert generator.check_add_entity_to_layer_valid()
     assert generator.check_add_entity_to_layer_invalid()
+
+@pytest.mark.parametrize("server", [('layer_rest_server_url')])
+def test_change_entity_in_layer(get_function_name, get_log, get_config, server, get_status):
+    generator = LayerManagerValidationClient(endpoint=get_config["SERVICES"][server],
+                                             schema=os.path.abspath(OPENAPI_SCHEMA),
+                                             generator_config=os.path.abspath(OPENAPI_CONFIG_PATH),
+                                             headers={'accept': 'application/json', 'Content-Type': 'application/json'},
+                                             log=get_log)
+
+    assert generator.check_change_entity_valid()
+    assert generator.check_change_entity_invalid()
+
+
+@pytest.mark.parametrize("server", [('layer_rest_server_url')])
+def test_change_entity_in_layer_multiple(get_function_name, get_log, get_config, server, get_status):
+    generator = LayerManagerValidationClient(endpoint=get_config["SERVICES"][server],
+                                             schema=os.path.abspath(OPENAPI_SCHEMA),
+                                             generator_config=os.path.abspath(OPENAPI_CONFIG_PATH),
+                                             headers={'accept': 'application/json', 'Content-Type': 'application/json'},
+                                             log=get_log)
+    assert generator.check_change_entity_valid_all_combinations()
+    assert generator.check_change_entity_invalid_all_combinations()
