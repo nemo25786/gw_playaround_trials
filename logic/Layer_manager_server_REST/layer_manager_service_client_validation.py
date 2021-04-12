@@ -89,7 +89,7 @@ class LayerManagerValidationClient(object):
         if openapi_endpoint is None:
             openapi_endpoint = endpoint
 
-        request_object = self.generator.get_full_request_object(endpoint=openapi_endpoint, method=method, remove={"entities", "createdAt", "updatedAt"})
+        request_object = self.generator.get_full_request_object(endpoint=openapi_endpoint, method=method, remove={"entities"})
         response = FUNC_ptr_DICT[method](url=urljoin(self.endpoint, endpoint[1:]), headers=self.headers,
                                          request_json=request_object, log=self.log)
 
