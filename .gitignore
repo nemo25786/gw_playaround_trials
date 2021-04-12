@@ -27,7 +27,7 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
-
+.idea
 # PyInstaller
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
@@ -141,3 +141,6 @@ cython_debug/
 
 /tests/test_Layer_manager_gw_GraphQL/allure-results/
 /allure-results/
+/.icd_gen_cache/
+/tests/test_Layer_manager_REST_API_validate/allure-results/
+/tests/test_Layer_manager_REST_API_validate/.icd_gen_cache/

@@ -4,3 +4,9 @@
 [submodule "GrafanaSnapshot"]
 	path = GrafanaSnapshot
 	url = git@github.com:rnd-hub/GrafanaSnapshot.git
+[submodule "ccst_openapi_data_generator"]
+	path = ccst_openapi_data_generator
+	url = https://github.com/rnd-hub/ccst_openapi_data_generator.git
+[submodule "ccst_deep_compare"]
+	path = ccst_deep_compare
+	url = https://github.com/rnd-hub/ccst_deep_compare.git
