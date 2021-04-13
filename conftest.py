@@ -42,7 +42,7 @@ def pytest_runtest_makereport(item, call):
 @pytest.fixture(scope="function", autouse=False)
 def get_function_name(request):
     time = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
-    function_name = format_filename(request.node.nodeid) + "_" + time
+    function_name = format_filename(request.node.name) + "_" + time
 
     return function_name
 

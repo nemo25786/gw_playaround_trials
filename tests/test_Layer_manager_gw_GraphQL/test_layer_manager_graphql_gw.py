@@ -18,6 +18,7 @@ def test_get_layers_feature(get_function_name, get_log, get_config, server, chec
             print(f"{layer.name}:{entity.name}:{entity.id}:{entity.timestamp}:{entity.geo_data.geometry.type}:{entity.geo_data.geometry.coordinates}")
 
 
+@pytest.mark.xfail
 @pytest.mark.regression
 @pytest.mark.parametrize("server", [('layer_server_url')])
 def test_get_layers_collection(get_function_name, get_log, get_config, server, check_connect_to_server, get_status):
