@@ -1,11 +1,12 @@
 from datetime import datetime
 import pytest
-from logic.Layer_manager_server_REST.layers_manager.models import Layer
+from logic.Layer_manager_server_REST.layers_manager.models import Layer, Entity
+
 from faker import Faker
 
 fake = Faker()
 
-class Test_layer_resource(object):
+class Test_layers_resource(object):
     @staticmethod
     @pytest.mark.parametrize("server", [('layer_rest_server_url')])
     def test_add_layer_legal(get_function_name, get_log, get_config, server, layer_manager_client, delete_db, get_status):
@@ -73,6 +74,14 @@ class Test_layer_resource(object):
         assert f"{response.id} does not exist" in response_get.message
         response_delete = layer_manager_client.layers.layer_id_delete(layer_id=response.id)
         assert f"{response.id} does not exist" in response_delete.message
+
+
+
+class Test_layer_resource(object):
+    @pytest.mark.parametrize("server", [('layer_rest_server_url')])
+    def test_add_entity_to_layer(get_function_name, get_log, get_config, server, layer_manager_client, delete_db, get_status):
+        new_entity = Entity(name=None, id=None, type=None)
+        layer_manager_client.layers.layer_id_entities_entity_id_get(layer_id=None, entity_id=None)
 
 
 
