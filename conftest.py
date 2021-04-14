@@ -14,6 +14,7 @@ from GrafanaSnapshot import SnapshotFace
 from jsonformatter import JsonFormatter
 from infra.MongoDBUtils import MyMongoClient
 from logic.Layer_manager_server_REST.layers_manager import LayersManager
+from logic.Layer_manager_gw_graphQL_new import LayerManagerGWClient
 
 ZAPI_TEST_STATUS = {
              "pass": {"id": 1},
@@ -136,11 +137,15 @@ def set_warning_to_all_loggers_except(logger_name):
             logger.setLevel(logging.WARNING)
 
 
-@pytest.fixture(scope='function', autouse=False)
-def check_connect_to_server(get_function_name, get_log, get_config, server):
-    response = improved_get(log=get_log, url=get_config["SERVICES"][server], params={})
+def check_connect_to_service(get_log, service_url):
+    response = improved_get(log=get_log, url=service_url, params={})
 
     assert response.status_code != requests.codes.not_found
+
+
+@pytest.fixture(scope='function', autouse=False)
+def check_connect_to_server(get_log, get_config, server):
+    check_connect_to_service(get_log, service_url=get_config["SERVICES"][server])
 
 @pytest.fixture(scope="function", autouse=False)
 def layer_manager_client(server, get_config):
@@ -193,4 +198,15 @@ def mongodb_client(get_log, get_config):
 
     assert is_db_empty(mongodb_collection)
 
-    return mongodb_collection
+    yield mongodb_collection
+
+    mongodb_client.close()
+
+@pytest.fixture(scope="function", autouse=False)
+def layer_manager_gw_client(get_log, get_config):
+    check_connect_to_service(get_log=get_log, service_url=get_config["SERVICES"]["layer_server_url"])
+
+    layer_manager = LayerManagerGWClient(url=get_config["SERVICES"]["layer_server_url"], logger=get_log, headers=None)
+
+    yield layer_manager
+
