@@ -144,3 +144,4 @@ cython_debug/
 /.icd_gen_cache/
 /tests/test_Layer_manager_REST_API_validate/allure-results/
 /tests/test_Layer_manager_REST_API_validate/.icd_gen_cache/
+/tests/test_Layer_manager_REST_API_client/allure-results/

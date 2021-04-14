@@ -379,6 +379,7 @@ class LayersOperations(object):
     def query_post(
         self,
         body,  # type: "_models.LayerQuery"
+        log: logging.Logger = logging.getLogger(),
         **kwargs  # type: Any
     ):
         # type: (...) -> Union[List["_models.Layer"], "_models.Error"]
@@ -415,6 +416,8 @@ class LayersOperations(object):
         body_content_kwargs = {}  # type: Dict[str, Any]
         body_content = self._serialize.body(body, 'LayerQuery')
         body_content_kwargs['content'] = body_content
+
+        log.debug(f"sending query post for {url} with query parameters: {query_parameters}, header: {header_parameters} and body {json.dumps(body_content_kwargs, indent=2)}")
         request = self._client.post(url, query_parameters, header_parameters, **body_content_kwargs)
         pipeline_response = self._client._pipeline.run(request, stream=False, **kwargs)
         response = pipeline_response.http_response
@@ -434,6 +437,8 @@ class LayersOperations(object):
 
         if cls:
             return cls(pipeline_response, deserialized, {})
+
+        log.debug(f"got response for query post operation with {response.status_code} and content {deserialized}")
 
         return deserialized
     query_post.metadata = {'url': '/layers/query'}  # type: ignore

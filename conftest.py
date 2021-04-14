@@ -12,7 +12,7 @@ from ccst_config_reader import ConfigReader
 import logging
 from GrafanaSnapshot import SnapshotFace
 from jsonformatter import JsonFormatter
-
+from infra.MongoDBUtils import MyMongoClient
 from logic.Layer_manager_server_REST.layers_manager import LayersManager
 
 ZAPI_TEST_STATUS = {
@@ -172,3 +172,25 @@ def delete_db(layer_manager_client, get_log):
         get_log.warning("could not empty entire db...")
 
 
+def is_db_empty(mongodb_collection):
+    for doc in mongodb_collection.list_all_docs():
+        return False
+
+    return True
+
+
+@pytest.fixture(scope="function", autouse=False)
+def mongodb_client(get_log, get_config):
+    mongodb_client = MyMongoClient(log=get_log, mongo_db_host_endpoint=get_config["SERVICES"]["layer_manager_mongo_db"],
+                                 mongo_db_port=int(get_config["SERVICES"]["layer_manager_mongo_db_port"]))
+
+    assert "layers-manager" in mongodb_client.list_all_db()
+
+    mongodb_database = mongodb_client.get_existing_db(existing_db_name="layers-manager")
+    assert "layers" in mongodb_database.list_all_collections_in_db()
+
+    mongodb_collection = mongodb_database.get_existing_collection(collection_name="layers")
+
+    assert is_db_empty(mongodb_collection)
+
+    return mongodb_collection

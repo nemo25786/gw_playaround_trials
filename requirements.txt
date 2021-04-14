@@ -136,3 +136,5 @@ typing-extensions==3.7.4.3
 urllib3==1.26.4
 yarg==0.1.9
 zipp==3.4.1
+
+pymongo~=3.11.3
