@@ -12,7 +12,7 @@ from ccst_config_reader import ConfigReader
 import logging
 from GrafanaSnapshot import SnapshotFace
 from jsonformatter import JsonFormatter
-from infra.MongoDBUtils import MyMongoClient
+from infra.MongoDBUtils import MyMongoClient, MyMongoCollection
 from logic.Layer_manager_server_REST.layers_manager import LayersManager
 from logic.Layer_manager_gw_graphQL_new import LayerManagerGWClient
 

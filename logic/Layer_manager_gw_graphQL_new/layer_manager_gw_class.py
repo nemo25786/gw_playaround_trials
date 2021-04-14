@@ -1,6 +1,6 @@
 from pprint import pprint
 
-from .Schema.layer_manager_gw_schema import layer_manager_gw_schema as schema, FeatureGeoData, FeatureCollectionGeoData
+from .Schema.layer_manager_gw_schema import layer_manager_gw_schema as schema, FeatureGeoData, FeatureCollectionGeoData, Layer
 from sgqlc.endpoint.http import HTTPEndpoint
 from sgqlc.operation import Operation
 from infra.graphQLutils import *
@@ -52,7 +52,7 @@ class LayerManagerGWClient():
 
         return query_plus_data.get_layers
 
-    def get_layers_as_feature_wo_entities_with_query_param(self, layers_subset):
+    def get_layers_as_feature_wo_entities_with_query_param(self, layers_subset) -> Layer:
         layer_gw_op = Operation(schema.Query)
         gw_layer_op = layer_gw_op.get_layers(layer_ids=layers_subset)
         gw_layer_op.id()
