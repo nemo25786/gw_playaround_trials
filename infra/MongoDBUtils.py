@@ -65,6 +65,11 @@ class MyMongoDatabase():
         mongodb_collection = MyMongoCollection(collection=collection)
         return mongodb_collection
 
+    def authenticate_with_db(self, user, password):
+        auth_status = self.db.authenticate(user, password, mechanism='SCRAM-SHA-1')
+
+        return auth_status
+
 
 class MyMongoCollection():
     def __init__(self, collection: Collection):
