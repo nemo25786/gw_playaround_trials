@@ -16,6 +16,7 @@ paths:
   /layers:
     post:
       summary: Insert a layer
+      operationId: layers_post
       tags:
         - layers
       requestBody:
@@ -23,14 +24,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Layer'
+              $ref: '#/components/schemas/LayerRequest'
       responses:
         200:
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Layer'
+                $ref: '#/components/schemas/LayerResponse'
         400:
           description: Bad Request
         500:
@@ -38,6 +39,7 @@ paths:
 
     get:
       summary: Get a list of layers
+      operationId: layers_get
       tags:
         - layers
       parameters:
@@ -53,7 +55,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LayerCollection'
+                $ref: '#/components/schemas/LayerCollectionResponse'
         400:
           description: Bad Request
           content:
@@ -71,6 +73,7 @@ paths:
   /layers/{layerId}:
     put:
       summary: Update a layer by id
+      operationId: layers_layer_id_put
       tags:
         - layers
       parameters:
@@ -85,14 +88,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Layer'
+              $ref: '#/components/schemas/LayerRequest'
       responses:
         200:
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Layer'
+                $ref: '#/components/schemas/LayerResponse'
         400:
           description: Bad Request
           content:
@@ -114,6 +117,7 @@ paths:
 
     get:
       summary: Get a layer by id
+      operationId: layers_layer_id_get
       tags:
         - layers
       parameters:
@@ -129,7 +133,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Layer'
+                $ref: '#/components/schemas/LayerResponse'
         400:
           description: Bad Request
           content:
@@ -151,6 +155,7 @@ paths:
 
     delete:
       summary: Delete a layer by id
+      operationId: layers_layer_id_delete
       tags:
         - layers
       parameters:
@@ -166,7 +171,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Layer'
+                $ref: '#/components/schemas/LayerResponse'
         400:
           description: Bad Request
           content:
@@ -189,6 +194,7 @@ paths:
   /layers/query:
     post:
       summary: Query a subset of layers and their entities, by a timestamp and a bounding box
+      operationId: layers_query_post
       tags:
         - layers
       requestBody:
@@ -196,14 +202,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LayerQuery'
+              $ref: '#/components/schemas/LayerQueryRequest'
       responses:
         200:
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LayerCollection'
+                $ref: '#/components/schemas/LayerQueryResponse'
         400:
           description: Bad Request
           content:
@@ -221,6 +227,7 @@ paths:
   /layers/{layerId}/entities:
     post:
       summary: Insert entities in a batch
+      operationId: layers_layer_id_entities_post
       tags:
         - entities
       parameters:
@@ -235,14 +242,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EntityCollection'
+              $ref: '#/components/schemas/EntityCollectionRequest'
       responses:
         200:
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EntityCollection'
+                $ref: '#/components/schemas/EntityCollectionResponse'
         400:
           description: Bad Request
           content:
@@ -259,6 +266,7 @@ paths:
   /layers/{layerId}/entities/{entityId}:
     put:
       summary: Update an entity by id
+      operationId: layers_layer_id_entities_entity_id_put
       tags:
         - entities
       parameters:
@@ -279,14 +287,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Entity'
+              $ref: '#/components/schemas/EntityRequest'
       responses:
         200:
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Entity'
+                $ref: '#/components/schemas/EntityResponse'
         400:
           description: Bad Request
           content:
@@ -308,6 +316,7 @@ paths:
 
     get:
       summary: Get an entity by id
+      operationId: layers_layer_id_entities_entity_id_get
       tags:
         - entities
       parameters:
@@ -329,7 +338,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Entity'
+                $ref: '#/components/schemas/EntityResponse'
         400:
           description: Bad Request
           content:
@@ -351,6 +360,7 @@ paths:
 
     delete:
       summary: Delete an entity by id
+      operationId: layers_layer_id_entities_entity_id_delete
       tags:
         - entities
       parameters:
@@ -372,7 +382,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Entity'
+                $ref: '#/components/schemas/EntityResponse'
         400:
           description: Bad Request
           content:
@@ -396,37 +406,36 @@ components:
   schemas:
 
     # Layers
-    Layer:
+    LayerRequest:
       type: object
-      required:
-        - name
       properties:
-        id:
-          type: string
-          description: Layer's id
         name:
           type: string
           description: Layer's name
-        createdAt:
-          type: string
-          format: date-time
-          description: Timestamp of the last update, ISO-8601 formatted
-        updatedAt:
-          type: string
-          format: date-time
-          description: Timestamp of the last update, ISO-8601 formatted
-        entities:
-          type: array
-          description: A list of the layer's entities
-          items:
-            $ref: '#/components/schemas/Entity'
 
-    LayerCollection:
+    LayerResponse:
+      allOf:
+        - $ref: '#/components/schemas/LayerRequest'
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Layer's id
+            createdAt:
+              type: string
+              format: date-time
+              description: Timestamp of the last update, ISO-8601 formatted
+            updatedAt:
+              type: string
+              format: date-time
+              description: Timestamp of the last update, ISO-8601 formatted
+
+    LayerCollectionResponse:
       type: array
       items:
-        $ref: '#/components/schemas/Layer'
+        $ref: '#/components/schemas/LayerResponse'
 
-    LayerQuery:
+    LayerQueryRequest:
       type: object
       required:
         - layers
@@ -441,11 +450,22 @@ components:
           description: A timestamp, ISO-8601 formatted. If provided, entities updated since the timestamp will be fetched
           nullable: true
           type: string
-          format: date-time
+          example: '2021-04-13T11:54:51.288+00:00'
         bbox:
           description: A geo bounding box. If provided, entities within the box will be fetched
           nullable: true
           $ref: '#/components/schemas/BoundingBox'
+
+    LayerQueryResponse:
+      type: array
+      items:
+        allOf:
+          - $ref: '#/components/schemas/LayerResponse'
+          - type: object
+            properties:
+              entities:
+                description: A list of the layer's entities
+                $ref: '#/components/schemas/EntityCollectionResponse'
 
     Error:
       type: object
@@ -454,17 +474,13 @@ components:
           type: string
 
     # Entities
-    Entity:
+    EntityRequest:
       type: object
       required:
         - name
         - layerId
         - type
-        - timestamp
       properties:
-        id:
-          type: string
-          description: Entity's id
         externalId:
           type: string
           description: Entity's external id
@@ -477,25 +493,39 @@ components:
         layerId:
           type: string
           description: The containing layer id
-        createdAt:
-          type: string
-          format: date-time
-          description: Timestamp of the last update, ISO-8601 formatted
-        updatedAt:
-          type: string
-          format: date-time
-          description: Timestamp of the last update, ISO-8601 formatted
         geoData:
           description: A GeoJson data object
           nullable: true
-          oneOf:
+          anyOf:
             - $ref: '#/components/schemas/Feature'
             - $ref: '#/components/schemas/FeatureCollection'
 
-    EntityCollection:
+    EntityResponse:
+      allOf:
+        - $ref: '#/components/schemas/EntityRequest'
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Entity's id
+            createdAt:
+              type: string
+              format: date-time
+              description: Timestamp of the last update, ISO-8601 formatted
+            updatedAt:
+              type: string
+              format: date-time
+              description: Timestamp of the last update, ISO-8601 formatted
+
+    EntityCollectionRequest:
       type: array
       items:
-        $ref: '#/components/schemas/Entity'
+        $ref: '#/components/schemas/EntityRequest'
+
+    EntityCollectionResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/EntityResponse'
 
     # GeoJson
     PointCoordinates:
@@ -629,7 +659,7 @@ components:
             - Feature
         geometry:
           nullable: true
-          oneOf:
+          anyOf:
             - $ref: '#/components/schemas/Point'
             - $ref: '#/components/schemas/LineString'
             - $ref: '#/components/schemas/Polygon'
@@ -654,8 +684,9 @@ components:
             $ref: '#/components/schemas/Feature'
 
     BoundingBox:
-      description: 'An array of 4 floats, representing a bounding box. The array consists of the following points: [ [ bottom-left x ], [ upper-left y ], [ upper-right x ], [ upper-right y ] ]'
+      description: 'An array of 4 floats, representing a bounding box. The array consists of the following points: [ [ bottom-left x ], [ bottom-left y ], [ upper-right x ], [ upper-right y ] ]'
       type: array
+      nullable: true
       minItems: 4
       maxItems: 4
       items:

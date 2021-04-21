@@ -10,3 +10,10 @@ def test_mongo_auth():
 
     for item in list:
         print(item)
+
+    layer = db.get_existing_collection("layers")
+
+    docs = layer.list_all_docs()
+
+    for doc in docs:
+        print(doc)

@@ -1,1 +1,1 @@
-from .layer_manager_gw_class import LayerManagerGWClient
+from .layer_manager_gw_client import LayerManagerGWClient

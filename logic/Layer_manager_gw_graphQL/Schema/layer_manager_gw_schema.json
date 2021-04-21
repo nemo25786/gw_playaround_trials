@@ -148,15 +148,6 @@
           "inputFields": null,
           "interfaces": null,
           "kind": "SCALAR",
-          "name": "JSON",
-          "possibleTypes": null
-        },
-        {
-          "enumValues": null,
-          "fields": null,
-          "inputFields": null,
-          "interfaces": null,
-          "kind": "SCALAR",
           "name": "JSONObject",
           "possibleTypes": null
         },
@@ -374,13 +365,9 @@
               "args": [],
               "name": "id",
               "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "SCALAR",
-                  "name": "ID",
-                  "ofType": null
-                }
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
               }
             },
             {
@@ -397,7 +384,30 @@
               }
             },
             {
-              "args": [],
+              "args": [
+                {
+                  "defaultValue": null,
+                  "name": "since",
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "DateTime",
+                    "ofType": null
+                  }
+                },
+                {
+                  "defaultValue": null,
+                  "name": "bbox",
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "Float",
+                      "ofType": null
+                    }
+                  }
+                }
+              ],
               "name": "entities",
               "type": {
                 "kind": "LIST",
@@ -422,7 +432,7 @@
           "inputFields": null,
           "interfaces": null,
           "kind": "SCALAR",
-          "name": "ID",
+          "name": "String",
           "possibleTypes": null
         },
         {
@@ -431,7 +441,7 @@
           "inputFields": null,
           "interfaces": null,
           "kind": "SCALAR",
-          "name": "String",
+          "name": "Float",
           "possibleTypes": null
         },
         {
@@ -445,7 +455,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "SCALAR",
-                  "name": "ID",
+                  "name": "String",
                   "ofType": null
                 }
               }
@@ -478,7 +488,7 @@
             },
             {
               "args": [],
-              "name": "timestamp",
+              "name": "updatedAt",
               "type": {
                 "kind": "SCALAR",
                 "name": "DateTime",
@@ -505,7 +515,21 @@
           "enumValues": null,
           "fields": [
             {
-              "args": [],
+              "args": [
+                {
+                  "defaultValue": null,
+                  "name": "layerIds",
+                  "type": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "String",
+                      "ofType": null
+                    }
+                  }
+                }
+              ],
               "name": "getLayers",
               "type": {
                 "kind": "LIST",
@@ -516,74 +540,12 @@
                   "ofType": null
                 }
               }
-            },
-            {
-              "args": [
-                {
-                  "defaultValue": null,
-                  "name": "layers",
-                  "type": {
-                    "kind": "LIST",
-                    "name": null,
-                    "ofType": {
-                      "kind": "SCALAR",
-                      "name": "String",
-                      "ofType": null
-                    }
-                  }
-                },
-                {
-                  "defaultValue": null,
-                  "name": "since",
-                  "type": {
-                    "kind": "SCALAR",
-                    "name": "DateTime",
-                    "ofType": null
-                  }
-                },
-                {
-                  "defaultValue": null,
-                  "name": "bbox",
-                  "type": {
-                    "kind": "LIST",
-                    "name": null,
-                    "ofType": {
-                      "kind": "SCALAR",
-                      "name": "Float",
-                      "ofType": null
-                    }
-                  }
-                }
-              ],
-              "name": "getLayersAndEntities",
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "LIST",
-                  "name": null,
-                  "ofType": {
-                    "kind": "OBJECT",
-                    "name": "Layer",
-                    "ofType": null
-                  }
-                }
-              }
             }
           ],
           "inputFields": null,
           "interfaces": [],
           "kind": "OBJECT",
           "name": "Query",
-          "possibleTypes": null
-        },
-        {
-          "enumValues": null,
-          "fields": null,
-          "inputFields": null,
-          "interfaces": null,
-          "kind": "SCALAR",
-          "name": "Float",
           "possibleTypes": null
         },
         {

@@ -39,21 +39,21 @@ class LayersOperations:
 
     async def post(
         self,
-        body: "_models.Layer",
+        body: "_models.LayerRequest",
         **kwargs
-    ) -> Optional["_models.Layer"]:
+    ) -> Optional["_models.LayerResponse"]:
         """Insert a layer.
 
         Insert a layer.
 
         :param body:
-        :type body: ~layers_manager.models.Layer
+        :type body: ~layers_manager.models.LayerRequest
         :keyword callable cls: A custom type or function that will be passed the direct response
-        :return: Layer, or the result of cls(response)
-        :rtype: ~layers_manager.models.Layer or None
+        :return: LayerResponse, or the result of cls(response)
+        :rtype: ~layers_manager.models.LayerResponse or None
         :raises: ~azure.core.exceptions.HttpResponseError
         """
-        cls = kwargs.pop('cls', None)  # type: ClsType[Optional["_models.Layer"]]
+        cls = kwargs.pop('cls', None)  # type: ClsType[Optional["_models.LayerResponse"]]
         error_map = {
             401: ClientAuthenticationError, 404: ResourceNotFoundError, 409: ResourceExistsError
         }
@@ -73,7 +73,7 @@ class LayersOperations:
         header_parameters['Accept'] = self._serialize.header("accept", accept, 'str')
 
         body_content_kwargs = {}  # type: Dict[str, Any]
-        body_content = self._serialize.body(body, 'Layer')
+        body_content = self._serialize.body(body, 'LayerRequest')
         body_content_kwargs['content'] = body_content
         request = self._client.post(url, query_parameters, header_parameters, **body_content_kwargs)
         pipeline_response = await self._client._pipeline.run(request, stream=False, **kwargs)
@@ -85,7 +85,7 @@ class LayersOperations:
 
         deserialized = None
         if response.status_code == 200:
-            deserialized = self._deserialize('Layer', pipeline_response)
+            deserialized = self._deserialize('LayerResponse', pipeline_response)
 
         if cls:
             return cls(pipeline_response, deserialized, {})
@@ -97,7 +97,7 @@ class LayersOperations:
         self,
         subset: Optional[str] = None,
         **kwargs
-    ) -> Union[List["_models.Layer"], "_models.Error"]:
+    ) -> Union[List["_models.LayerResponse"], "_models.Error"]:
         """Get a list of layers.
 
         Get a list of layers.
@@ -105,11 +105,11 @@ class LayersOperations:
         :param subset: A subset of layer ids, colon separated.
         :type subset: str
         :keyword callable cls: A custom type or function that will be passed the direct response
-        :return: list of Layer or Error, or the result of cls(response)
-        :rtype: list[~layers_manager.models.Layer] or ~layers_manager.models.Error
+        :return: list of LayerResponse or Error, or the result of cls(response)
+        :rtype: list[~layers_manager.models.LayerResponse] or ~layers_manager.models.Error
         :raises: ~azure.core.exceptions.HttpResponseError
         """
-        cls = kwargs.pop('cls', None)  # type: ClsType[Union[List["_models.Layer"], "_models.Error"]]
+        cls = kwargs.pop('cls', None)  # type: ClsType[Union[List["_models.LayerResponse"], "_models.Error"]]
         error_map = {
             401: ClientAuthenticationError, 404: ResourceNotFoundError, 409: ResourceExistsError
         }
@@ -137,7 +137,7 @@ class LayersOperations:
             raise HttpResponseError(response=response)
 
         if response.status_code == 200:
-            deserialized = self._deserialize('[Layer]', pipeline_response)
+            deserialized = self._deserialize('[LayerResponse]', pipeline_response)
 
         if response.status_code == 400:
             deserialized = self._deserialize('Error', pipeline_response)
@@ -154,9 +154,9 @@ class LayersOperations:
     async def layer_id_put(
         self,
         layer_id: str,
-        body: "_models.Layer",
+        body: "_models.LayerRequest",
         **kwargs
-    ) -> Union["_models.Layer", "_models.Error"]:
+    ) -> Union["_models.LayerResponse", "_models.Error"]:
         """Update a layer by id.
 
         Update a layer by id.
@@ -164,13 +164,13 @@ class LayersOperations:
         :param layer_id: Layer's id.
         :type layer_id: str
         :param body:
-        :type body: ~layers_manager.models.Layer
+        :type body: ~layers_manager.models.LayerRequest
         :keyword callable cls: A custom type or function that will be passed the direct response
-        :return: Layer or Error, or the result of cls(response)
-        :rtype: ~layers_manager.models.Layer or ~layers_manager.models.Error
+        :return: LayerResponse or Error, or the result of cls(response)
+        :rtype: ~layers_manager.models.LayerResponse or ~layers_manager.models.Error
         :raises: ~azure.core.exceptions.HttpResponseError
         """
-        cls = kwargs.pop('cls', None)  # type: ClsType[Union["_models.Layer", "_models.Error"]]
+        cls = kwargs.pop('cls', None)  # type: ClsType[Union["_models.LayerResponse", "_models.Error"]]
         error_map = {
             401: ClientAuthenticationError, 404: ResourceNotFoundError, 409: ResourceExistsError
         }
@@ -194,7 +194,7 @@ class LayersOperations:
         header_parameters['Accept'] = self._serialize.header("accept", accept, 'str')
 
         body_content_kwargs = {}  # type: Dict[str, Any]
-        body_content = self._serialize.body(body, 'Layer')
+        body_content = self._serialize.body(body, 'LayerRequest')
         body_content_kwargs['content'] = body_content
         request = self._client.put(url, query_parameters, header_parameters, **body_content_kwargs)
         pipeline_response = await self._client._pipeline.run(request, stream=False, **kwargs)
@@ -205,7 +205,7 @@ class LayersOperations:
             raise HttpResponseError(response=response)
 
         if response.status_code == 200:
-            deserialized = self._deserialize('Layer', pipeline_response)
+            deserialized = self._deserialize('LayerResponse', pipeline_response)
 
         if response.status_code == 400:
             deserialized = self._deserialize('Error', pipeline_response)
@@ -226,7 +226,7 @@ class LayersOperations:
         self,
         layer_id: str,
         **kwargs
-    ) -> Union["_models.Layer", "_models.Error"]:
+    ) -> Union["_models.LayerResponse", "_models.Error"]:
         """Get a layer by id.
 
         Get a layer by id.
@@ -234,11 +234,11 @@ class LayersOperations:
         :param layer_id: Layer's id.
         :type layer_id: str
         :keyword callable cls: A custom type or function that will be passed the direct response
-        :return: Layer or Error, or the result of cls(response)
-        :rtype: ~layers_manager.models.Layer or ~layers_manager.models.Error
+        :return: LayerResponse or Error, or the result of cls(response)
+        :rtype: ~layers_manager.models.LayerResponse or ~layers_manager.models.Error
         :raises: ~azure.core.exceptions.HttpResponseError
         """
-        cls = kwargs.pop('cls', None)  # type: ClsType[Union["_models.Layer", "_models.Error"]]
+        cls = kwargs.pop('cls', None)  # type: ClsType[Union["_models.LayerResponse", "_models.Error"]]
         error_map = {
             401: ClientAuthenticationError, 404: ResourceNotFoundError, 409: ResourceExistsError
         }
@@ -268,7 +268,7 @@ class LayersOperations:
             raise HttpResponseError(response=response)
 
         if response.status_code == 200:
-            deserialized = self._deserialize('Layer', pipeline_response)
+            deserialized = self._deserialize('LayerResponse', pipeline_response)
 
         if response.status_code == 400:
             deserialized = self._deserialize('Error', pipeline_response)
@@ -289,7 +289,7 @@ class LayersOperations:
         self,
         layer_id: str,
         **kwargs
-    ) -> Union["_models.Layer", "_models.Error"]:
+    ) -> Union["_models.LayerResponse", "_models.Error"]:
         """Delete a layer by id.
 
         Delete a layer by id.
@@ -297,11 +297,11 @@ class LayersOperations:
         :param layer_id: Layer's id.
         :type layer_id: str
         :keyword callable cls: A custom type or function that will be passed the direct response
-        :return: Layer or Error, or the result of cls(response)
-        :rtype: ~layers_manager.models.Layer or ~layers_manager.models.Error
+        :return: LayerResponse or Error, or the result of cls(response)
+        :rtype: ~layers_manager.models.LayerResponse or ~layers_manager.models.Error
         :raises: ~azure.core.exceptions.HttpResponseError
         """
-        cls = kwargs.pop('cls', None)  # type: ClsType[Union["_models.Layer", "_models.Error"]]
+        cls = kwargs.pop('cls', None)  # type: ClsType[Union["_models.LayerResponse", "_models.Error"]]
         error_map = {
             401: ClientAuthenticationError, 404: ResourceNotFoundError, 409: ResourceExistsError
         }
@@ -331,7 +331,7 @@ class LayersOperations:
             raise HttpResponseError(response=response)
 
         if response.status_code == 200:
-            deserialized = self._deserialize('Layer', pipeline_response)
+            deserialized = self._deserialize('LayerResponse', pipeline_response)
 
         if response.status_code == 400:
             deserialized = self._deserialize('Error', pipeline_response)
@@ -350,21 +350,21 @@ class LayersOperations:
 
     async def query_post(
         self,
-        body: "_models.LayerQuery",
+        body: "_models.LayerQueryRequest",
         **kwargs
-    ) -> Union[List["_models.Layer"], "_models.Error"]:
+    ) -> Union[List["_models.LayerQueryResponseItem"], "_models.Error"]:
         """Query a subset of layers and their entities, by a timestamp and a bounding box.
 
         Query a subset of layers and their entities, by a timestamp and a bounding box.
 
         :param body:
-        :type body: ~layers_manager.models.LayerQuery
+        :type body: ~layers_manager.models.LayerQueryRequest
         :keyword callable cls: A custom type or function that will be passed the direct response
-        :return: list of Layer or Error, or the result of cls(response)
-        :rtype: list[~layers_manager.models.Layer] or ~layers_manager.models.Error
+        :return: list of LayerQueryResponseItem or Error, or the result of cls(response)
+        :rtype: list[~layers_manager.models.LayerQueryResponseItem] or ~layers_manager.models.Error
         :raises: ~azure.core.exceptions.HttpResponseError
         """
-        cls = kwargs.pop('cls', None)  # type: ClsType[Union[List["_models.Layer"], "_models.Error"]]
+        cls = kwargs.pop('cls', None)  # type: ClsType[Union[List["_models.LayerQueryResponseItem"], "_models.Error"]]
         error_map = {
             401: ClientAuthenticationError, 404: ResourceNotFoundError, 409: ResourceExistsError
         }
@@ -384,7 +384,7 @@ class LayersOperations:
         header_parameters['Accept'] = self._serialize.header("accept", accept, 'str')
 
         body_content_kwargs = {}  # type: Dict[str, Any]
-        body_content = self._serialize.body(body, 'LayerQuery')
+        body_content = self._serialize.body(body, 'LayerQueryRequest')
         body_content_kwargs['content'] = body_content
         request = self._client.post(url, query_parameters, header_parameters, **body_content_kwargs)
         pipeline_response = await self._client._pipeline.run(request, stream=False, **kwargs)
@@ -395,7 +395,7 @@ class LayersOperations:
             raise HttpResponseError(response=response)
 
         if response.status_code == 200:
-            deserialized = self._deserialize('[Layer]', pipeline_response)
+            deserialized = self._deserialize('[LayerQueryResponseItem]', pipeline_response)
 
         if response.status_code == 400:
             deserialized = self._deserialize('Error', pipeline_response)
@@ -412,9 +412,9 @@ class LayersOperations:
     async def layer_id_entities_post(
         self,
         layer_id: str,
-        body: List["_models.Entity"],
+        body: List["_models.EntityRequest"],
         **kwargs
-    ) -> Union[List["_models.Entity"], "_models.Error"]:
+    ) -> Union[List["_models.EntityResponse"], "_models.Error"]:
         """Insert entities in a batch.
 
         Insert entities in a batch.
@@ -422,13 +422,13 @@ class LayersOperations:
         :param layer_id: Layer's id.
         :type layer_id: str
         :param body:
-        :type body: list[~layers_manager.models.Entity]
+        :type body: list[~layers_manager.models.EntityRequest]
         :keyword callable cls: A custom type or function that will be passed the direct response
-        :return: list of Entity or Error, or the result of cls(response)
-        :rtype: list[~layers_manager.models.Entity] or ~layers_manager.models.Error
+        :return: list of EntityResponse or Error, or the result of cls(response)
+        :rtype: list[~layers_manager.models.EntityResponse] or ~layers_manager.models.Error
         :raises: ~azure.core.exceptions.HttpResponseError
         """
-        cls = kwargs.pop('cls', None)  # type: ClsType[Union[List["_models.Entity"], "_models.Error"]]
+        cls = kwargs.pop('cls', None)  # type: ClsType[Union[List["_models.EntityResponse"], "_models.Error"]]
         error_map = {
             401: ClientAuthenticationError, 404: ResourceNotFoundError, 409: ResourceExistsError
         }
@@ -452,7 +452,7 @@ class LayersOperations:
         header_parameters['Accept'] = self._serialize.header("accept", accept, 'str')
 
         body_content_kwargs = {}  # type: Dict[str, Any]
-        body_content = self._serialize.body(body, '[Entity]')
+        body_content = self._serialize.body(body, '[EntityRequest]')
         body_content_kwargs['content'] = body_content
         request = self._client.post(url, query_parameters, header_parameters, **body_content_kwargs)
         pipeline_response = await self._client._pipeline.run(request, stream=False, **kwargs)
@@ -463,7 +463,7 @@ class LayersOperations:
             raise HttpResponseError(response=response)
 
         if response.status_code == 200:
-            deserialized = self._deserialize('[Entity]', pipeline_response)
+            deserialized = self._deserialize('[EntityResponse]', pipeline_response)
 
         if response.status_code == 400:
             deserialized = self._deserialize('Error', pipeline_response)
@@ -481,9 +481,9 @@ class LayersOperations:
         self,
         layer_id: str,
         entity_id: str,
-        body: "_models.Entity",
+        body: "_models.EntityRequest",
         **kwargs
-    ) -> Union["_models.Entity", "_models.Error"]:
+    ) -> Union["_models.EntityResponse", "_models.Error"]:
         """Update an entity by id.
 
         Update an entity by id.
@@ -493,13 +493,13 @@ class LayersOperations:
         :param entity_id: Entity's id.
         :type entity_id: str
         :param body:
-        :type body: ~layers_manager.models.Entity
+        :type body: ~layers_manager.models.EntityRequest
         :keyword callable cls: A custom type or function that will be passed the direct response
-        :return: Entity or Error, or the result of cls(response)
-        :rtype: ~layers_manager.models.Entity or ~layers_manager.models.Error
+        :return: EntityResponse or Error, or the result of cls(response)
+        :rtype: ~layers_manager.models.EntityResponse or ~layers_manager.models.Error
         :raises: ~azure.core.exceptions.HttpResponseError
         """
-        cls = kwargs.pop('cls', None)  # type: ClsType[Union["_models.Entity", "_models.Error"]]
+        cls = kwargs.pop('cls', None)  # type: ClsType[Union["_models.EntityResponse", "_models.Error"]]
         error_map = {
             401: ClientAuthenticationError, 404: ResourceNotFoundError, 409: ResourceExistsError
         }
@@ -524,7 +524,7 @@ class LayersOperations:
         header_parameters['Accept'] = self._serialize.header("accept", accept, 'str')
 
         body_content_kwargs = {}  # type: Dict[str, Any]
-        body_content = self._serialize.body(body, 'Entity')
+        body_content = self._serialize.body(body, 'EntityRequest')
         body_content_kwargs['content'] = body_content
         request = self._client.put(url, query_parameters, header_parameters, **body_content_kwargs)
         pipeline_response = await self._client._pipeline.run(request, stream=False, **kwargs)
@@ -535,7 +535,7 @@ class LayersOperations:
             raise HttpResponseError(response=response)
 
         if response.status_code == 200:
-            deserialized = self._deserialize('Entity', pipeline_response)
+            deserialized = self._deserialize('EntityResponse', pipeline_response)
 
         if response.status_code == 400:
             deserialized = self._deserialize('Error', pipeline_response)
@@ -557,7 +557,7 @@ class LayersOperations:
         layer_id: str,
         entity_id: str,
         **kwargs
-    ) -> Union["_models.Entity", "_models.Error"]:
+    ) -> Union["_models.EntityResponse", "_models.Error"]:
         """Get an entity by id.
 
         Get an entity by id.
@@ -567,11 +567,11 @@ class LayersOperations:
         :param entity_id: Entity's id.
         :type entity_id: str
         :keyword callable cls: A custom type or function that will be passed the direct response
-        :return: Entity or Error, or the result of cls(response)
-        :rtype: ~layers_manager.models.Entity or ~layers_manager.models.Error
+        :return: EntityResponse or Error, or the result of cls(response)
+        :rtype: ~layers_manager.models.EntityResponse or ~layers_manager.models.Error
         :raises: ~azure.core.exceptions.HttpResponseError
         """
-        cls = kwargs.pop('cls', None)  # type: ClsType[Union["_models.Entity", "_models.Error"]]
+        cls = kwargs.pop('cls', None)  # type: ClsType[Union["_models.EntityResponse", "_models.Error"]]
         error_map = {
             401: ClientAuthenticationError, 404: ResourceNotFoundError, 409: ResourceExistsError
         }
@@ -602,7 +602,7 @@ class LayersOperations:
             raise HttpResponseError(response=response)
 
         if response.status_code == 200:
-            deserialized = self._deserialize('Entity', pipeline_response)
+            deserialized = self._deserialize('EntityResponse', pipeline_response)
 
         if response.status_code == 400:
             deserialized = self._deserialize('Error', pipeline_response)
@@ -624,7 +624,7 @@ class LayersOperations:
         layer_id: str,
         entity_id: str,
         **kwargs
-    ) -> Union["_models.Entity", "_models.Error"]:
+    ) -> Union["_models.EntityResponse", "_models.Error"]:
         """Delete an entity by id.
 
         Delete an entity by id.
@@ -634,11 +634,11 @@ class LayersOperations:
         :param entity_id: Entity's id.
         :type entity_id: str
         :keyword callable cls: A custom type or function that will be passed the direct response
-        :return: Entity or Error, or the result of cls(response)
-        :rtype: ~layers_manager.models.Entity or ~layers_manager.models.Error
+        :return: EntityResponse or Error, or the result of cls(response)
+        :rtype: ~layers_manager.models.EntityResponse or ~layers_manager.models.Error
         :raises: ~azure.core.exceptions.HttpResponseError
         """
-        cls = kwargs.pop('cls', None)  # type: ClsType[Union["_models.Entity", "_models.Error"]]
+        cls = kwargs.pop('cls', None)  # type: ClsType[Union["_models.EntityResponse", "_models.Error"]]
         error_map = {
             401: ClientAuthenticationError, 404: ResourceNotFoundError, 409: ResourceExistsError
         }
@@ -669,7 +669,7 @@ class LayersOperations:
             raise HttpResponseError(response=response)
 
         if response.status_code == 200:
-            deserialized = self._deserialize('Entity', pipeline_response)
+            deserialized = self._deserialize('EntityResponse', pipeline_response)
 
         if response.status_code == 400:
             deserialized = self._deserialize('Error', pipeline_response)

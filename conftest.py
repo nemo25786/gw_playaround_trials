@@ -1,6 +1,8 @@
 import os
 import sys
 import time
+from urllib.parse import urljoin
+
 import pytest
 import datetime
 import allure
@@ -13,8 +15,8 @@ import logging
 from GrafanaSnapshot import SnapshotFace
 from jsonformatter import JsonFormatter
 from infra.MongoDBUtils import MyMongoClient, MyMongoCollection
+from logic.Layer_manager_gw_graphQL import LayerManagerGWClient
 from logic.Layer_manager_server_REST.layers_manager import LayersManager
-from logic.Layer_manager_gw_graphQL_new import LayerManagerGWClient
 
 ZAPI_TEST_STATUS = {
              "pass": {"id": 1},
@@ -137,19 +139,17 @@ def set_warning_to_all_loggers_except(logger_name):
             logger.setLevel(logging.WARNING)
 
 
-def check_connect_to_service(get_log, service_url):
-    response = improved_get(log=get_log, url=service_url, params={})
+def check_connect_to_service(get_log, service_liveness_url):
+    response = improved_get(log=get_log, url=service_liveness_url, params={})
 
-    assert response.status_code != requests.codes.not_found
+    assert response.status_code == requests.codes.ok
 
-
-@pytest.fixture(scope='function', autouse=False)
-def check_connect_to_server(get_log, get_config, server):
-    check_connect_to_service(get_log, service_url=get_config["SERVICES"][server])
 
 @pytest.fixture(scope="function", autouse=False)
-def layer_manager_client(server, get_config):
-    layer_manager_client = LayersManager(base_url=get_config["SERVICES"][server])
+def layer_manager_client(get_log, get_config):
+    check_connect_to_service(get_log, service_liveness_url=get_config["SERVICES"]["layer_manager_server_livenss"])
+
+    layer_manager_client = LayersManager(base_url=get_config["SERVICES"]["layer_rest_server_url"])
 
     yield layer_manager_client
 
@@ -189,14 +189,12 @@ def mongodb_client(get_log, get_config):
     mongodb_client = MyMongoClient(log=get_log, mongo_db_host_endpoint=get_config["SERVICES"]["layer_manager_mongo_db"],
                                  mongo_db_port=int(get_config["SERVICES"]["layer_manager_mongo_db_port"]))
 
-    assert "layers-manager" in mongodb_client.list_all_db()
+    mongodb_database = mongodb_client.get_existing_db(existing_db_name=get_config["SERVICES"]["mongo_layers_db"])
+    mongodb_database.authenticate_with_db(user=get_config["AUTH"]["mongo_db_user"], password=get_config["AUTH"]["mongo_db_password"])
 
-    mongodb_database = mongodb_client.get_existing_db(existing_db_name="layers-manager")
-    assert "layers" in mongodb_database.list_all_collections_in_db()
+    assert get_config["SERVICES"]["mongo_layers_collection"] in mongodb_database.list_all_collections_in_db()
 
-    mongodb_collection = mongodb_database.get_existing_collection(collection_name="layers")
-
-    assert is_db_empty(mongodb_collection)
+    mongodb_collection = mongodb_database.get_existing_collection(collection_name=get_config["SERVICES"]["mongo_layers_collection"])
 
     yield mongodb_collection
 
@@ -204,9 +202,9 @@ def mongodb_client(get_log, get_config):
 
 @pytest.fixture(scope="function", autouse=False)
 def layer_manager_gw_client(get_log, get_config):
-    check_connect_to_service(get_log=get_log, service_url=get_config["SERVICES"]["layer_server_url"])
+    check_connect_to_service(get_log=get_log, service_liveness_url=get_config["SERVICES"]["layer_manager_gw_livenss"])
 
-    layer_manager = LayerManagerGWClient(url=get_config["SERVICES"]["layer_server_url"], logger=get_log, headers=None)
+    layer_manager = LayerManagerGWClient(url=get_config["SERVICES"]["layer_manager_gw_url"], logger=get_log, headers=None)
 
     yield layer_manager
 

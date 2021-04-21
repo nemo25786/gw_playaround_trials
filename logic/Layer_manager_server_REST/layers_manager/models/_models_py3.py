@@ -10,13 +10,32 @@ from typing import List, Optional
 import msrest.serialization
 
 
-class Entity(msrest.serialization.Model):
-    """Entity.
+class Components1O83W8DSchemasLayerqueryresponseItemsAllof1(msrest.serialization.Model):
+    """Components1O83W8DSchemasLayerqueryresponseItemsAllof1.
+
+    :param entities: A list of the layer's entities.
+    :type entities: list[~layers_manager.models.EntityResponse]
+    """
+
+    _attribute_map = {
+        'entities': {'key': 'entities', 'type': '[EntityResponse]'},
+    }
+
+    def __init__(
+        self,
+        *,
+        entities: Optional[List["EntityResponse"]] = None,
+        **kwargs
+    ):
+        super(Components1O83W8DSchemasLayerqueryresponseItemsAllof1, self).__init__(**kwargs)
+        self.entities = entities
+
+
+class EntityRequest(msrest.serialization.Model):
+    """EntityRequest.
 
     All required parameters must be populated in order to send to Azure.
 
-    :param id: Entity's id.
-    :type id: str
     :param external_id: Entity's external id.
     :type external_id: str
     :param name: Required. Entity's name.
@@ -25,10 +44,6 @@ class Entity(msrest.serialization.Model):
     :type type: str
     :param layer_id: Required. The containing layer id.
     :type layer_id: str
-    :param created_at: Timestamp of the last update, ISO-8601 formatted.
-    :type created_at: ~datetime.datetime
-    :param updated_at: Timestamp of the last update, ISO-8601 formatted.
-    :type updated_at: ~datetime.datetime
     :param geo_data: A GeoJson data object.
     :type geo_data: object
     """
@@ -40,13 +55,10 @@ class Entity(msrest.serialization.Model):
     }
 
     _attribute_map = {
-        'id': {'key': 'id', 'type': 'str'},
         'external_id': {'key': 'externalId', 'type': 'str'},
         'name': {'key': 'name', 'type': 'str'},
         'type': {'key': 'type', 'type': 'str'},
         'layer_id': {'key': 'layerId', 'type': 'str'},
-        'created_at': {'key': 'createdAt', 'type': 'iso-8601'},
-        'updated_at': {'key': 'updatedAt', 'type': 'iso-8601'},
         'geo_data': {'key': 'geoData', 'type': 'object'},
     }
 
@@ -56,22 +68,75 @@ class Entity(msrest.serialization.Model):
         name: str,
         type: str,
         layer_id: str,
-        id: Optional[str] = None,
         external_id: Optional[str] = None,
-        created_at: Optional[datetime.datetime] = None,
-        updated_at: Optional[datetime.datetime] = None,
         geo_data: Optional[object] = None,
         **kwargs
     ):
-        super(Entity, self).__init__(**kwargs)
-        self.id = id
+        super(EntityRequest, self).__init__(**kwargs)
         self.external_id = external_id
         self.name = name
         self.type = type
         self.layer_id = layer_id
+        self.geo_data = geo_data
+
+
+class EntityResponse(EntityRequest):
+    """EntityResponse.
+
+    All required parameters must be populated in order to send to Azure.
+
+    :param external_id: Entity's external id.
+    :type external_id: str
+    :param name: Required. Entity's name.
+    :type name: str
+    :param type: Required. Entity's type.
+    :type type: str
+    :param layer_id: Required. The containing layer id.
+    :type layer_id: str
+    :param geo_data: A GeoJson data object.
+    :type geo_data: object
+    :param id: Entity's id.
+    :type id: str
+    :param created_at: Timestamp of the last update, ISO-8601 formatted.
+    :type created_at: ~datetime.datetime
+    :param updated_at: Timestamp of the last update, ISO-8601 formatted.
+    :type updated_at: ~datetime.datetime
+    """
+
+    _validation = {
+        'name': {'required': True},
+        'type': {'required': True},
+        'layer_id': {'required': True},
+    }
+
+    _attribute_map = {
+        'external_id': {'key': 'externalId', 'type': 'str'},
+        'name': {'key': 'name', 'type': 'str'},
+        'type': {'key': 'type', 'type': 'str'},
+        'layer_id': {'key': 'layerId', 'type': 'str'},
+        'geo_data': {'key': 'geoData', 'type': 'object'},
+        'id': {'key': 'id', 'type': 'str'},
+        'created_at': {'key': 'createdAt', 'type': 'iso-8601'},
+        'updated_at': {'key': 'updatedAt', 'type': 'iso-8601'},
+    }
+
+    def __init__(
+        self,
+        *,
+        name: str,
+        type: str,
+        layer_id: str,
+        external_id: Optional[str] = None,
+        geo_data: Optional[object] = None,
+        id: Optional[str] = None,
+        created_at: Optional[datetime.datetime] = None,
+        updated_at: Optional[datetime.datetime] = None,
+        **kwargs
+    ):
+        super(EntityResponse, self).__init__(external_id=external_id, name=name, type=type, layer_id=layer_id, geo_data=geo_data, **kwargs)
+        self.id = id
         self.created_at = created_at
         self.updated_at = updated_at
-        self.geo_data = geo_data
 
 
 class Error(msrest.serialization.Model):
@@ -164,55 +229,8 @@ class FeatureCollection(msrest.serialization.Model):
         self.features = features
 
 
-class Layer(msrest.serialization.Model):
-    """Layer.
-
-    All required parameters must be populated in order to send to Azure.
-
-    :param id: Layer's id.
-    :type id: str
-    :param name: Required. Layer's name.
-    :type name: str
-    :param created_at: Timestamp of the last update, ISO-8601 formatted.
-    :type created_at: ~datetime.datetime
-    :param updated_at: Timestamp of the last update, ISO-8601 formatted.
-    :type updated_at: ~datetime.datetime
-    :param entities: A list of the layer's entities.
-    :type entities: list[~layers_manager.models.Entity]
-    """
-
-    _validation = {
-        'name': {'required': True},
-    }
-
-    _attribute_map = {
-        'id': {'key': 'id', 'type': 'str'},
-        'name': {'key': 'name', 'type': 'str'},
-        'created_at': {'key': 'createdAt', 'type': 'iso-8601'},
-        'updated_at': {'key': 'updatedAt', 'type': 'iso-8601'},
-        'entities': {'key': 'entities', 'type': '[Entity]'},
-    }
-
-    def __init__(
-        self,
-        *,
-        name: str,
-        id: Optional[str] = None,
-        created_at: Optional[datetime.datetime] = None,
-        updated_at: Optional[datetime.datetime] = None,
-        entities: Optional[List["Entity"]] = None,
-        **kwargs
-    ):
-        super(Layer, self).__init__(**kwargs)
-        self.id = id
-        self.name = name
-        self.created_at = created_at
-        self.updated_at = updated_at
-        self.entities = entities
-
-
-class LayerQuery(msrest.serialization.Model):
-    """LayerQuery.
+class LayerQueryRequest(msrest.serialization.Model):
+    """LayerQueryRequest.
 
     All required parameters must be populated in order to send to Azure.
 
@@ -220,7 +238,7 @@ class LayerQuery(msrest.serialization.Model):
     :type layers: list[str]
     :param since: A timestamp, ISO-8601 formatted. If provided, entities updated since the
      timestamp will be fetched.
-    :type since: ~datetime.datetime
+    :type since: str
     :param bbox: A geo bounding box. If provided, entities within the box will be fetched.
     :type bbox: list[float]
     """
@@ -232,7 +250,7 @@ class LayerQuery(msrest.serialization.Model):
 
     _attribute_map = {
         'layers': {'key': 'layers', 'type': '[str]'},
-        'since': {'key': 'since', 'type': 'iso-8601'},
+        'since': {'key': 'since', 'type': 'str'},
         'bbox': {'key': 'bbox', 'type': '[float]'},
     }
 
@@ -240,14 +258,111 @@ class LayerQuery(msrest.serialization.Model):
         self,
         *,
         layers: List[str],
-        since: Optional[datetime.datetime] = None,
+        since: Optional[str] = None,
         bbox: Optional[List[float]] = None,
         **kwargs
     ):
-        super(LayerQuery, self).__init__(**kwargs)
+        super(LayerQueryRequest, self).__init__(**kwargs)
         self.layers = layers
         self.since = since
         self.bbox = bbox
+
+
+class LayerRequest(msrest.serialization.Model):
+    """LayerRequest.
+
+    :param name: Layer's name.
+    :type name: str
+    """
+
+    _attribute_map = {
+        'name': {'key': 'name', 'type': 'str'},
+    }
+
+    def __init__(
+        self,
+        *,
+        name: Optional[str] = None,
+        **kwargs
+    ):
+        super(LayerRequest, self).__init__(**kwargs)
+        self.name = name
+
+
+class LayerResponse(LayerRequest):
+    """LayerResponse.
+
+    :param name: Layer's name.
+    :type name: str
+    :param id: Layer's id.
+    :type id: str
+    :param created_at: Timestamp of the last update, ISO-8601 formatted.
+    :type created_at: ~datetime.datetime
+    :param updated_at: Timestamp of the last update, ISO-8601 formatted.
+    :type updated_at: ~datetime.datetime
+    """
+
+    _attribute_map = {
+        'name': {'key': 'name', 'type': 'str'},
+        'id': {'key': 'id', 'type': 'str'},
+        'created_at': {'key': 'createdAt', 'type': 'iso-8601'},
+        'updated_at': {'key': 'updatedAt', 'type': 'iso-8601'},
+    }
+
+    def __init__(
+        self,
+        *,
+        name: Optional[str] = None,
+        id: Optional[str] = None,
+        created_at: Optional[datetime.datetime] = None,
+        updated_at: Optional[datetime.datetime] = None,
+        **kwargs
+    ):
+        super(LayerResponse, self).__init__(name=name, **kwargs)
+        self.id = id
+        self.created_at = created_at
+        self.updated_at = updated_at
+
+
+class LayerQueryResponseItem(LayerResponse, Components1O83W8DSchemasLayerqueryresponseItemsAllof1):
+    """LayerQueryResponseItem.
+
+    :param entities: A list of the layer's entities.
+    :type entities: list[~layers_manager.models.EntityResponse]
+    :param name: Layer's name.
+    :type name: str
+    :param id: Layer's id.
+    :type id: str
+    :param created_at: Timestamp of the last update, ISO-8601 formatted.
+    :type created_at: ~datetime.datetime
+    :param updated_at: Timestamp of the last update, ISO-8601 formatted.
+    :type updated_at: ~datetime.datetime
+    """
+
+    _attribute_map = {
+        'entities': {'key': 'entities', 'type': '[EntityResponse]'},
+        'name': {'key': 'name', 'type': 'str'},
+        'id': {'key': 'id', 'type': 'str'},
+        'created_at': {'key': 'createdAt', 'type': 'iso-8601'},
+        'updated_at': {'key': 'updatedAt', 'type': 'iso-8601'},
+    }
+
+    def __init__(
+        self,
+        *,
+        entities: Optional[List["EntityResponse"]] = None,
+        name: Optional[str] = None,
+        id: Optional[str] = None,
+        created_at: Optional[datetime.datetime] = None,
+        updated_at: Optional[datetime.datetime] = None,
+        **kwargs
+    ):
+        super(LayerQueryResponseItem, self).__init__(name=name, id=id, created_at=created_at, updated_at=updated_at, entities=entities, **kwargs)
+        self.entities = entities
+        self.name = name
+        self.id = id
+        self.created_at = created_at
+        self.updated_at = updated_at
 
 
 class LineString(msrest.serialization.Model):

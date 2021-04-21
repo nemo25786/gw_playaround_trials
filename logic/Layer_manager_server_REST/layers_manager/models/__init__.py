@@ -5,12 +5,16 @@
 # --------------------------------------------------------------------------
 
 try:
-    from ._models_py3 import Entity
+    from ._models_py3 import Components1O83W8DSchemasLayerqueryresponseItemsAllof1
+    from ._models_py3 import EntityRequest
+    from ._models_py3 import EntityResponse
     from ._models_py3 import Error
     from ._models_py3 import Feature
     from ._models_py3 import FeatureCollection
-    from ._models_py3 import Layer
-    from ._models_py3 import LayerQuery
+    from ._models_py3 import LayerQueryRequest
+    from ._models_py3 import LayerQueryResponseItem
+    from ._models_py3 import LayerRequest
+    from ._models_py3 import LayerResponse
     from ._models_py3 import LineString
     from ._models_py3 import MultiLineString
     from ._models_py3 import MultiPoint
@@ -18,12 +22,16 @@ try:
     from ._models_py3 import Point
     from ._models_py3 import Polygon
 except (SyntaxError, ImportError):
-    from ._models import Entity  # type: ignore
+    from ._models import Components1O83W8DSchemasLayerqueryresponseItemsAllof1  # type: ignore
+    from ._models import EntityRequest  # type: ignore
+    from ._models import EntityResponse  # type: ignore
     from ._models import Error  # type: ignore
     from ._models import Feature  # type: ignore
     from ._models import FeatureCollection  # type: ignore
-    from ._models import Layer  # type: ignore
-    from ._models import LayerQuery  # type: ignore
+    from ._models import LayerQueryRequest  # type: ignore
+    from ._models import LayerQueryResponseItem  # type: ignore
+    from ._models import LayerRequest  # type: ignore
+    from ._models import LayerResponse  # type: ignore
     from ._models import LineString  # type: ignore
     from ._models import MultiLineString  # type: ignore
     from ._models import MultiPoint  # type: ignore
@@ -32,12 +40,16 @@ except (SyntaxError, ImportError):
     from ._models import Polygon  # type: ignore
 
 __all__ = [
-    'Entity',
+    'Components1O83W8DSchemasLayerqueryresponseItemsAllof1',
+    'EntityRequest',
+    'EntityResponse',
     'Error',
     'Feature',
     'FeatureCollection',
-    'Layer',
-    'LayerQuery',
+    'LayerQueryRequest',
+    'LayerQueryResponseItem',
+    'LayerRequest',
+    'LayerResponse',
     'LineString',
     'MultiLineString',
     'MultiPoint',
