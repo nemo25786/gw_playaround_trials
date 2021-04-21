@@ -84,13 +84,13 @@ class Test_layer_manager():
 
         assert new_layer_post_response is not None and new_layer_post_response.name == LAYER_NAME
 
-        for i in range(10):
+        for i in range(20):
             new_entity_name = f"{fake.unique.first_name()}_{i}"
             new_entity = EntityRequest(layer_id=new_layer_post_response.id,
                                        name=new_entity_name,
                                        type="BMW",
                                        geo_data=Feature(geometry=Point(coordinates=[random.randint(-180, 180), random.randint(-90, 90)]),
-                                                        properties={"heading": random.randint(0, 4) * 90}))
+                                                        properties={"heading": random.randint(0, 3) * 90}))
             new_entity_post_request = layer_manager_client.layers.layer_id_entities_post(layer_id=new_layer_post_response.id,
                                                                                          body=[new_entity])
             assert new_entity_post_request[0].name == new_entity_name
