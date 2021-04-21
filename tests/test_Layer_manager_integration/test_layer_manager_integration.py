@@ -1,4 +1,3 @@
-import datetime
 import math
 import time
 
@@ -6,53 +5,18 @@ import pytest
 from bson import ObjectId
 from faker import Faker
 import random
-from logging import Logger, getLogger
+from logging import Logger
+
+from logic.Layer_manager_server_REST.layer_manager_utils import create_and_validate_layer, delete_layer, update_layer
 from logic.Layer_manager_server_REST.layers_manager.models import LayerRequest, LayerQueryRequest, EntityRequest, Point, \
     Feature
 from infra.MongoDBUtils import MyMongoCollection
-from logic.Layer_manager_server_REST.layers_manager import LayersManager
 from logic.Layer_manager_gw_graphQL import LayerManagerGWClient
 
 fake = Faker()
 
 LAYER_NAME = "vehicles"
 
-def create_and_validate_layer(layer_manager_client: LayersManager, get_log: Logger, layer_body: LayerRequest=LayerRequest(name=fake.unique.first_name())):
-    response = layer_manager_client.layers.post(body=layer_body, log=get_log)
-    assert response.name == layer_body.name, get_log.error("unable to add new layer")
-    response_get = layer_manager_client.layers.layer_id_get(layer_id=response.id, log=get_log)
-    assert response_get.name == response.name, get_log.error("unable to get existing layer")
-
-    return response.id, response.name
-
-def update_layer(layer_manager_client: LayersManager, layer_id, get_log: Logger, layer_body:LayerRequest=LayerRequest(name=fake.unique.first_name())):
-    response = layer_manager_client.layers.layer_id_put(layer_id=layer_id, body=layer_body, log=get_log)
-
-    assert response.name == layer_body.name, get_log.error("unable to update existing layer")
-
-    return response.id, response.name
-
-def delete_layer(layer_manager_client: LayersManager, get_log: Logger, layer_id):
-    response = layer_manager_client.layers.layer_id_delete(layer_id=layer_id)
-
-    assert response.id == layer_id, get_log.error("unable to delete layer")
-
-    return response.id, response.name
-
-def get_all_layers(layer_manager_client: LayersManager, get_log: Logger) -> list:
-    layer_get_response = layer_manager_client.layers.get(log=get_log)
-
-    assert layer_get_response is list, get_log.error("unable to get all layers")
-
-    return layer_get_response
-
-def query_layers_for_entities(layer_manager_client: LayersManager, get_log: Logger, layer_ids: list, since:str, bbox: [float]) -> list:
-    layer_request = LayerQueryRequest(layers=layer_ids, since=since, bbox=bbox)
-    layer_request_response = layer_manager_client.layers.query_post(body=layer_request, log=get_log)
-
-    assert layer_request_response is list
-
-    return layer_request_response
 
 def validate_layer_creation_in_db(mongodb_client: MyMongoCollection, layer_id, layer_name:str, get_log: Logger):
     docs = mongodb_client.get_doc_by_query(query={"_id": ObjectId(layer_id)})
@@ -74,15 +38,15 @@ class Test_layer_manager():
     @staticmethod
     def test_read_layer(get_function_name, get_log, get_config, layer_manager_client, delete_db, mongodb_client, layer_manager_gw_client, get_status):
         for i in range(10):
-            layer_id, layer_name = create_and_validate_layer(layer_manager_client, get_log)
+            layer_id, layer_name = create_and_validate_layer(layer_manager_client, get_log, layer_body=LayerRequest(name=fake.unique.first_name()))
             validate_layer_creation_in_db(mongodb_client, layer_id, layer_name, get_log)
             validate_layer_creation_in_gw(layer_manager_gw_client, layer_id, layer_name, get_log)
 
     @staticmethod
     def test_update_layer(get_function_name, get_log, get_config, layer_manager_client, delete_db, mongodb_client, layer_manager_gw_client, get_status):
-        layer_id, layer_name = create_and_validate_layer(layer_manager_client, get_log)
+        layer_id, layer_name = create_and_validate_layer(layer_manager_client, get_log, layer_body=LayerRequest(name=fake.unique.first_name()))
         validate_layer_creation_in_gw(layer_manager_gw_client, layer_id, layer_name, get_log)
-        updated_layer_id, updated_layer_name = update_layer(layer_manager_client, layer_id, get_log)
+        updated_layer_id, updated_layer_name = update_layer(layer_manager_client, layer_id, get_log, layer_body=LayerRequest(name=fake.unique.first_name()))
         validate_layer_creation_in_db(mongodb_client, updated_layer_id, updated_layer_name, get_log)
         validate_layer_creation_in_gw(layer_manager_gw_client, layer_id, updated_layer_name, get_log)
 
@@ -95,8 +59,8 @@ class Test_layer_manager():
 
     @staticmethod
     def test_delete_layer(get_function_name, get_log, get_config, layer_manager_client, delete_db, mongodb_client, layer_manager_gw_client, get_status):
-        layer_id, layer_name = create_and_validate_layer(layer_manager_client, get_log)
-        deleted_layer_id, deleted_layer_name = delete_layer(layer_manager_client, layer_id, get_log)
+        layer_id, layer_name = create_and_validate_layer(layer_manager_client, get_log, layer_body=LayerRequest(name=fake.unique.first_name()))
+        deleted_layer_id, deleted_layer_name = delete_layer(layer_manager_client, layer_id=layer_id, get_log=get_log)
 
         try:
             validate_layer_creation_in_db(mongodb_client, deleted_layer_id, deleted_layer_name, get_log)
@@ -138,6 +102,11 @@ class Test_layer_manager():
             for entity in query_results[0].entities:
                 coordinates = entity.geo_data["geometry"]["coordinates"]
                 heading = entity.geo_data["properties"]["heading"]
+
+                long_factor, lat_factor = 0, 0
+                sign_factor_lat = 1 if (coordinates[0]) > 0 else -1
+                sign_factor_lon = 1 if (coordinates[1]) > 0 else -1
+
                 if heading == 0:
                     long_factor = 1
                     lat_factor = 0
@@ -151,7 +120,7 @@ class Test_layer_manager():
                     lat_factor = -1
                     long_factor = 0
 
-                new_coordinates = [(coordinates[0] + lat_factor * 0.1) % 180, (coordinates[1] + long_factor + 0.1) % 90]
+                new_coordinates = [((coordinates[0] + lat_factor * 0.1) % 180), ((coordinates[1] + long_factor * 0.1) % 90)]
                 changed_entity = EntityRequest(layer_id=new_layer_post_response.id, name=entity.name, type="BMW",
                                            geo_data=Feature(geometry=Point(coordinates=new_coordinates), properties={"heading": heading}))
                 put_result = layer_manager_client.layers.layer_id_entities_entity_id_put(layer_id=new_layer_post_response.id,
