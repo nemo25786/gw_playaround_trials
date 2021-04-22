@@ -72,7 +72,7 @@ def add_entities_to_layer(layer_manager_client: LayersManager, get_log: Logger, 
 
     post_entities_response = layer_manager_client.layers.layer_id_entities_post(layer_id=layer_id, log=get_log, body=entity_request_body_list)
 
-    len(post_entities_response) == len(entity_request_body_list), get_log.error("unable to add entities to layer")
+    assert len(post_entities_response) == len(entity_request_body_list), get_log.error("unable to add entities to layer")
 
     return post_entities_response
 
@@ -88,6 +88,15 @@ def change_entity_in_layer(layer_manager_client: LayersManager, get_log: Logger,
                                                                 entity_id=entity_id,
                                                                 body=entity_request_body_change)
 
-    assert put_entity_response.updated_at != get_old_entity_response.updated_at
+    assert put_entity_response.updated_at != get_old_entity_response.updated_at, get_log.error("unable to update entitiy")
+
+    return put_entity_response
+
+def get_entity_in_layer(layer_manager_client: LayersManager, get_log: Logger, layer_id, entity_id):
+    get_entity_response = layer_manager_client.layers.layer_id_entities_entity_id_get(layer_id=layer_id, entity_id=entity_id)
+
+    assert get_entity_response.id == entity_id, get_log.error("unable to get entity in layer")
+
+    return get_entity_response
 
 

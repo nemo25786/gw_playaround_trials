@@ -2,6 +2,8 @@ import json
 import time
 from datetime import datetime, timedelta
 import pytest
+
+from logic.Layer_manager_server_REST.layer_manager_utils import get_entity_in_layer
 from logic.Layer_manager_server_REST.layers_manager.models import LayerRequest, EntityRequest, LayerQueryRequest, \
     Feature, LineString, Point
 from faker import Faker
@@ -118,16 +120,20 @@ class Test_layers_resource(object):
 class Test_entity_resource(object):
     @staticmethod
     def test_add_entity_to_layer(get_function_name, get_log, get_config, layer_manager_client, delete_db, get_status):
-        new_layer = LayerRequest(name=fake.unique.first_name())
+        new_layer = LayerRequest(name="vehicles")
         response_post = layer_manager_client.layers.post(body=new_layer, log=get_log)
         assert response_post is not None and response_post.name == new_layer.name, get_log.error("cannot add layer")
         response_get = layer_manager_client.layers.layer_id_get(layer_id=response_post.id, log=get_log)
         assert response_get.name == response_post.name, get_log.error("cannot get layer")
 
-        new_entity = EntityRequest(layer_id=response_post.id, name="trial_entity", type="trial", geo_data=Feature(geometry=Point(coordinates=[1.3, 2]), properties={"someprop": "somevalue"}))
+        new_entity = EntityRequest(layer_id=response_post.id, name="trial", type="BMW", geo_data=Feature(geometry=Point(coordinates=[34.989571, 32.79044]), properties={"heading": 90}))
         entity_response_post = layer_manager_client.layers.layer_id_entities_post(layer_id=response_post.id, body=[new_entity])
 
         assert len(entity_response_post) == 1 and entity_response_post[0].name == new_entity.name, get_log.error("cannot add entity to layer")
+
+        get_entity_response = get_entity_in_layer(layer_manager_client=layer_manager_client, layer_id=response_post.id, entity_id=entity_response_post[0].id, get_log=get_log)
+
+        assert get_entity_response.id == entity_response_post[0].id
 
         new_entity = EntityRequest(layer_id=response_post.id, name="trial_entity", type="trial", geo_data=Feature(geometry=Point(coordinates=[1.3, -300]), properties={"someprop": "somevalue"}))
         entity_response_post = layer_manager_client.layers.layer_id_entities_post(layer_id=response_post.id, body=[new_entity])
@@ -139,49 +145,50 @@ class Test_entity_resource(object):
 
         assert "longitude/latitude is out of bounds" in entity_response_post.message, get_log.error("entity with illegal coordinates allowed - latitue")
 
-        new_entity = EntityRequest(layer_id=response_post.id, name="trial_entity", type="trial", geo_data=Feature(geometry=Point(coordinates=[1.3, 2]), properties={"someprop": "somevalue"}))
-        entity_response_post = layer_manager_client.layers.layer_id_entities_post(layer_id=response_post.id,
-                                                                                  body=[new_entity])
-        assert len(entity_response_post) == 1 and entity_response_post[0].name == new_entity.name, get_log.error("duplicate entity name allowed in single add")
-
-        new_entity = EntityRequest(layer_id=response_post.id, name="trial_entity", type="trial", geo_data=Feature(geometry=Point(coordinates=[0, 0]), properties={"someprop": "somevalue"}))
-        entity_response_post = layer_manager_client.layers.layer_id_entities_post(layer_id=response_post.id, body=[new_entity, new_entity])
-
-        assert len(entity_response_post) == 1 and entity_response_post[0].name == new_entity.name, get_log.error("duplicate entity name allowed in batch add")
+        # new_entity = EntityRequest(layer_id=response_post.id, name="trial_entity", type="trial", geo_data=Feature(geometry=Point(coordinates=[1.3, 2]), properties={"someprop": "somevalue"}))
+        # entity_response_post = layer_manager_client.layers.layer_id_entities_post(layer_id=response_post.id,
+        #                                                                           body=[new_entity])
+        # assert len(entity_response_post) == 1 and entity_response_post[0].name == new_entity.name, get_log.error("duplicate entity name allowed in single add")
+        #
+        # new_entity = EntityRequest(layer_id=response_post.id, name="trial_entity", type="trial", geo_data=Feature(geometry=Point(coordinates=[0, 0]), properties={"someprop": "somevalue"}))
+        # entity_response_post = layer_manager_client.layers.layer_id_entities_post(layer_id=response_post.id, body=[new_entity, new_entity])
+        #
+        # assert len(entity_response_post) == 1 and entity_response_post[0].name == new_entity.name, get_log.error("duplicate entity name allowed in batch add")
 
     @staticmethod
     def test_delete_entity_from_layer(get_function_name, get_log, get_config, layer_manager_client, delete_db, get_status):
-        new_layer = LayerRequest(name=fake.unique.first_name())
+        new_layer = LayerRequest(name="vehicles")
         response_post = layer_manager_client.layers.post(body=new_layer, log=get_log)
-        assert response_post is not None and response_post.name == new_layer.name
+        assert response_post is not None and response_post.name == new_layer.name, get_log.error("cannot add layer")
         response_get = layer_manager_client.layers.layer_id_get(layer_id=response_post.id, log=get_log)
-        assert response_get.name == response_post.name
+        assert response_get.name == response_post.name, get_log.error("cannot get layer")
 
-        new_entity = EntityRequest(layer_id=response_post.id, name="trial_entity", type="trial", geo_data=Feature(geometry=Point(coordinates=[1.3, 2]), properties={"someprop": "somevalue"}))
-        entity_response_post = layer_manager_client.layers.layer_id_entities_post(layer_id="fooo", body=[new_entity])
+        new_entity1 = EntityRequest(layer_id=response_post.id, name="trial1", type="BMW", geo_data=Feature(geometry=Point(coordinates=[32.79044, 34.989571]), properties={"heading": 90}))
+        entity_response_post = layer_manager_client.layers.layer_id_entities_post(layer_id=response_post.id, body=[new_entity1])
 
+        assert len(entity_response_post) == 1 and entity_response_post[0].name == new_entity1.name, get_log.error("cannot add entity to layer")
 
-        entity_response_post = layer_manager_client.layers.layer_id_entities_post(layer_id=response_post.id, body=[new_entity])
+        get_entity_response = get_entity_in_layer(layer_manager_client=layer_manager_client, layer_id=response_post.id, entity_id=entity_response_post[0].id, get_log=get_log)
 
-        assert len(entity_response_post) == 1 and entity_response_post[0].name == new_entity.name
-
-        new_entity2 = EntityRequest(layer_id=response_post.id, name="trial_entity_2", type="trial", geo_data=Feature(geometry=Point(coordinates=[1.3, 2]), properties={"someprop": "somevalue"}))
+        assert get_entity_response.id == entity_response_post[0].id
+        time.sleep(2)
+        new_entity2 = EntityRequest(layer_id=response_post.id, name="trial2", type="BMW", geo_data=Feature(geometry=Point(coordinates=[45, 45]), properties={"heading": 270}))
         entity2_response_post = layer_manager_client.layers.layer_id_entities_post(layer_id=response_post.id, body=[new_entity2])
 
         assert len(entity2_response_post) == 1 and entity2_response_post[0].name == new_entity2.name
 
         delete_entity_response = layer_manager_client.layers.layer_id_entities_entity_id_delete(layer_id=response_post.id, entity_id=entity_response_post[0].id)
 
-        assert delete_entity_response.name == new_entity.name
+        assert delete_entity_response.name == new_entity1.name
 
         get_entity_response = layer_manager_client.layers.layer_id_entities_entity_id_get(layer_id=response_post.id, entity_id=entity_response_post[0].id)
 
         assert f"Entity id: {entity_response_post[0].id} does not exist" in get_entity_response.message
 
-        very_new_entity = EntityRequest(layer_id=response_post.id, name="trial_entity", type="trial", geo_data=Feature(geometry=Point(coordinates=[1.3, 2]), properties={"someprop": "somevalue"}))
-        new_entity_response_post = layer_manager_client.layers.layer_id_entities_post(layer_id=response_post.id, body=[very_new_entity])
+        new_entity3 = EntityRequest(layer_id=response_post.id, name="trial1", type="BMW", geo_data=Feature(geometry=Point(coordinates=[0, 0]), properties={"heading": 270}))
+        entity3_response_post = layer_manager_client.layers.layer_id_entities_post(layer_id=response_post.id, body=[new_entity3])
 
-        assert len(new_entity_response_post) == 1 and new_entity_response_post[0].created_at != entity_response_post[0].created_at
+        assert len(entity3_response_post) == 1 and entity3_response_post[0].created_at != entity_response_post[0].created_at
 
         entity2_response_get = layer_manager_client.layers.layer_id_entities_entity_id_get(layer_id=response_post.id, entity_id=entity2_response_post[0].id)
 

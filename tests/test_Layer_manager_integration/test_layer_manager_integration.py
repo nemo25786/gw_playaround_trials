@@ -7,7 +7,8 @@ from faker import Faker
 import random
 from logging import Logger
 
-from logic.Layer_manager_server_REST.layer_manager_utils import create_and_validate_layer, delete_layer, update_layer
+from logic.Layer_manager_server_REST.layer_manager_utils import create_and_validate_layer, delete_layer, update_layer, \
+    add_entities_to_layer, get_entity_in_layer, change_entity_in_layer
 from logic.Layer_manager_server_REST.layers_manager.models import LayerRequest, LayerQueryRequest, EntityRequest, Point, \
     Feature
 from infra.MongoDBUtils import MyMongoCollection
@@ -104,8 +105,6 @@ class Test_layer_manager():
                 heading = entity.geo_data["properties"]["heading"]
 
                 long_factor, lat_factor = 0, 0
-                sign_factor_lat = 1 if (coordinates[0]) > 0 else -1
-                sign_factor_lon = 1 if (coordinates[1]) > 0 else -1
 
                 if heading == 0:
                     long_factor = 1
@@ -129,6 +128,97 @@ class Test_layer_manager():
                 assert put_result.updated_at != entity.updated_at
 
             time.sleep(1)
+
+    @staticmethod
+    def test_add_lots_of_planes_at_once(get_function_name, get_log, get_config, layer_manager_client, delete_db, mongodb_client, layer_manager_gw_client, get_status):
+        new_layer_id, new_layer_name = create_and_validate_layer(layer_manager_client=layer_manager_client,
+                                                                 get_log=get_log,
+                                                                 layer_body=LayerRequest(name=LAYER_NAME))
+        entity_list = {}
+        for i in range(500):
+            new_entity_name = f"target_{i}"
+            entity_request_body_list = [EntityRequest(layer_id=new_layer_id,
+                                                      name=new_entity_name,
+                                                      type="BMW",
+                                                      geo_data=Feature(geometry=Point(coordinates=[random.randint(-180, 180), random.randint(-90, 90)]),
+                                                      properties={"heading": random.randint(0, 3) * 90}))]
+            add_response = add_entities_to_layer(layer_manager_client=layer_manager_client,
+                                                 get_log=get_log,
+                                                 layer_id=new_layer_id,
+                                                 entity_request_body_list=entity_request_body_list)
+            entity_list[i] = {"id": add_response[0].id,
+                              "long": add_response[0].geo_data["geometry"]["coordinates"][0],
+                              "lat": add_response[0].geo_data["geometry"]["coordinates"][1],
+                              "heading": add_response[0].geo_data["properties"]["heading"]}
+
+        while (1):
+            for i in range(500):
+                entity_get = get_entity_in_layer(layer_manager_client=layer_manager_client,
+                                                 get_log=get_log,
+                                                 layer_id=new_layer_id,
+                                                 entity_id=entity_list[i]["id"])
+
+                assert entity_get.id == entity_list[i]["id"]
+                heading = entity_get.geo_data["properties"]["heading"]
+                x_factor, y_factor = decide_factors(heading)
+
+                entity_list[i]["long"] = (entity_list[i]["long"] + x_factor * 0.1) % 180
+                entity_list[i]["lat"] = (entity_list[i]["lat"] + y_factor * 0.1) % 90
+
+                entity_change = change_entity_in_layer(layer_manager_client=layer_manager_client,
+                                                       get_log=get_log,
+                                                       layer_id=new_layer_id,
+                                                       entity_id=entity_get.id,
+                                                       entity_request_body_change=EntityRequest(name=entity_get.name,
+                                                                                                layer_id=new_layer_id,
+                                                                                                type=entity_get.type,
+                                                                                                geo_data=Feature(geometry=Point(coordinates=[entity_list[i]["long"], entity_list[i]["lat"]]),
+                                                                                                                 properties={"heading": heading})))
+
+                assert entity_get.updated_at != entity_change.updated_at
+
+
+
+
+    @staticmethod
+    def test_add_multiple_of_planes_at_once_in_same_location(get_function_name, get_log, get_config, layer_manager_client, delete_db, mongodb_client, layer_manager_gw_client, get_status):
+        new_layer_id, new_layer_name = create_and_validate_layer(layer_manager_client=layer_manager_client,
+                                                                 get_log=get_log,
+                                                                 layer_body=LayerRequest(name=LAYER_NAME))
+        entity_list = {}
+        for i in range(30):
+            new_entity_name = f"target_{i}"
+            entity_request_body_list = [EntityRequest(layer_id=new_layer_id,
+                                                      name=new_entity_name,
+                                                      type="BMW",
+                                                      geo_data=Feature(geometry=Point(coordinates=[0.0001 * i , 0.0001 * i]),
+                                                      properties={"heading": i % 4 * 90}))]
+            add_response = add_entities_to_layer(layer_manager_client=layer_manager_client,
+                                                 get_log=get_log,
+                                                 layer_id=new_layer_id,
+                                                 entity_request_body_list=entity_request_body_list)
+            entity_list[i] = {"id": add_response[0].id,
+                              "long": add_response[0].geo_data["geometry"]["coordinates"][0],
+                              "lat": add_response[0].geo_data["geometry"]["coordinates"][1],
+                              "heading": add_response[0].geo_data["properties"]["heading"]}
+
+
+def decide_factors(heading):
+    x_factor, y_factor = 0, 0
+
+    if heading == 0:
+        y_factor = 1
+    if heading == 180:
+        y_factor = -1
+    if heading == 90:
+        x_factor = 1
+    if heading == 270:
+        x_factor = -1
+
+    return x_factor, y_factor
+
+
+
 
 
 
