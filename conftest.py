@@ -16,7 +16,10 @@ from GrafanaSnapshot import SnapshotFace
 from jsonformatter import JsonFormatter
 from infra.MongoDBUtils import MyMongoClient, MyMongoCollection
 from logic.Layer_manager_gw_graphQL import LayerManagerGWClient
+from logic.Layer_manager_server_REST.layer_manager_utils import get_all_layers, query_layers_for_entities, \
+    delete_entity, delete_layer
 from logic.Layer_manager_server_REST.layers_manager import LayersManager
+from logic.Layer_manager_server_REST.layers_manager.models import LayerQueryRequest
 
 ZAPI_TEST_STATUS = {
              "pass": {"id": 1},
@@ -157,24 +160,44 @@ def layer_manager_client(get_log, get_config):
 
 @pytest.fixture(scope="function", autouse=False)
 def delete_db(layer_manager_client, get_log):
-    try:
-        layers = layer_manager_client.layers.get()
-    except Exception as e:
-        get_log.warning(f"unable to delete db with msg {str(e)}")
-    else:
-         if layers is None:
-             get_log.warning(f"unable to delete db")
+    # try:
+    #     layers = layer_manager_client.layers.get()
+    # except Exception as e:
+    #     get_log.warning(f"unable to delete db with msg {str(e)}")
+    #     return
+    # else:
+    #      if layers is None:
+    #          get_log.warning(f"unable to delete db")
+    #         return
+    #
+    # for layer in layers:
+    #     resp = layer_manager_client.layers.layer_id_delete(layer.id)
+    #
+    #     if resp is None:
+    #         get_log.warning(f"unable to delete layer {layer.id}:{layer.name} from db")
+    #         return
+    #
+    # layers = layer_manager_client.layers.get()
+    #
+    # if len(layers) != 0:
+    #     get_log.warning("could not empty entire db...")
+
+    layers = get_all_layers(layer_manager_client=layer_manager_client, get_log=get_log)
 
     for layer in layers:
-        resp = layer_manager_client.layers.layer_id_delete(layer.id)
+        query_request = LayerQueryRequest(layers=[layer.id])
+        query_result = query_layers_for_entities(layer_manager_client=layer_manager_client, get_log=get_log, layer_request=query_request)
 
-        if resp is None:
-            get_log.warning(f"unable to delete layer {layer.id}:{layer.name} from db")
+        for entity in query_result[0].entities:
+            delete_entity(layer_manager_client=layer_manager_client,
+                          get_log=get_log,
+                          layer_id=layer.id,
+                          entity_id=entity.id)
 
-    layers = layer_manager_client.layers.get()
+        delete_layer(layer_manager_client=layer_manager_client, get_log=get_log, layer_id=layer.id)
 
-    if len(layers) != 0:
-        get_log.warning("could not empty entire db...")
+
+
 
 
 def is_db_empty(mongodb_collection):
@@ -195,6 +218,22 @@ def mongodb_client(get_log, get_config):
     assert get_config["SERVICES"]["mongo_layers_collection"] in mongodb_database.list_all_collections_in_db()
 
     mongodb_collection = mongodb_database.get_existing_collection(collection_name=get_config["SERVICES"]["mongo_layers_collection"])
+
+    yield mongodb_collection
+
+    mongodb_client.close()
+
+@pytest.fixture(scope="function", autouse=False)
+def mongodb_client_aircrafts(get_log, get_config):
+    mongodb_client = MyMongoClient(log=get_log, mongo_db_host_endpoint=get_config["SERVICES"]["layer_manager_mongo_db"],
+                                 mongo_db_port=int(get_config["SERVICES"]["layer_manager_mongo_db_port"]))
+
+    mongodb_database = mongodb_client.get_existing_db(existing_db_name=get_config["SERVICES"]["mongo_layers_db"])
+    mongodb_database.authenticate_with_db(user=get_config["AUTH"]["mongo_db_user"], password=get_config["AUTH"]["mongo_db_password"])
+
+    assert get_config["SERVICES"]["mongo_aircrafts_collection"] in mongodb_database.list_all_collections_in_db()
+
+    mongodb_collection = mongodb_database.get_existing_collection(collection_name=get_config["SERVICES"]["mongo_aircrafts_collection"])
 
     yield mongodb_collection
 

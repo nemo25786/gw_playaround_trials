@@ -54,15 +54,14 @@ def delete_layer(layer_manager_client: LayersManager, get_log: Logger, layer_id)
 def get_all_layers(layer_manager_client: LayersManager, get_log: Logger) -> list:
     layer_get_response = layer_manager_client.layers.get(log=get_log)
 
-    assert layer_get_response is list, get_log.error("unable to get all layers")
+    assert type(layer_get_response) is list, get_log.error("unable to get all layers")
 
     return layer_get_response
 
-def query_layers_for_entities(layer_manager_client: LayersManager, get_log: Logger, layer_ids: list, since:str, bbox: [float]) -> list:
-    layer_request = LayerQueryRequest(layers=layer_ids, since=since, bbox=bbox)
+def query_layers_for_entities(layer_manager_client: LayersManager, get_log: Logger, layer_request: LayerQueryRequest) -> list:
     layer_request_response = layer_manager_client.layers.query_post(body=layer_request, log=get_log)
 
-    assert layer_request_response is list, get_log.error("unable to query for entities using post")
+    assert len(layer_request_response) > 0, get_log.error("unable to query for entities using post")
 
     return layer_request_response
 
@@ -98,5 +97,12 @@ def get_entity_in_layer(layer_manager_client: LayersManager, get_log: Logger, la
     assert get_entity_response.id == entity_id, get_log.error("unable to get entity in layer")
 
     return get_entity_response
+
+def delete_entity(layer_manager_client: LayersManager, get_log: Logger, layer_id, entity_id):
+    delete_entity_response = layer_manager_client.layers.layer_id_entities_entity_id_delete(layer_id=layer_id, entity_id=entity_id)
+
+    assert delete_entity_response.id == entity_id, get_log.error("unable to delete entity")
+
+    return delete_entity_response
 
 

@@ -114,6 +114,7 @@ class Test_layers_resource(object):
         response_put = layer_manager_client.layers.layer_id_put(layer_id=response_post.id, body=change_layer)
         assert response_put is not None and response_put.name == change_layer.name, get_log.error("cannot update layer")
         query = LayerQueryRequest(layers=layers_subset, bbox=bbox, since=since)
+        query_response = layer_manager_client.layers.query_post(body=query, log=get_log)
         assert len(query_response) == 1, get_log.error("invalid result for query single layer")
 
 
