@@ -118,7 +118,7 @@ class Test_layer_manager():
 
 
     @staticmethod
-    def test_add_random_entities(get_function_name, get_log, get_config, layer_manager_client, delete_db, mongodb_client, layer_manager_gw_client, get_status):
+    def test_scenario_add_random_entities(get_function_name, get_log, get_config, layer_manager_client, delete_db, mongodb_client, layer_manager_gw_client, get_status):
         new_layer = LayerRequest(name=LAYER_NAME)
         layer_id, layer_name = create_and_validate_layer(layer_manager_client=layer_manager_client,
                                                          get_log=get_log,
@@ -161,7 +161,7 @@ class Test_layer_manager():
             time.sleep(1)
 
     @staticmethod
-    def test_add_lots_of_planes_at_once(get_function_name, get_log, get_config, layer_manager_client, delete_db, mongodb_client, layer_manager_gw_client, get_status):
+    def test_scenario_add_lots_of_planes_at_once(get_function_name, get_log, get_config, layer_manager_client, delete_db, mongodb_client, layer_manager_gw_client, get_status):
         new_layer_id, new_layer_name = create_and_validate_layer(layer_manager_client=layer_manager_client,
                                                                  get_log=get_log,
                                                                  layer_body=LayerRequest(name=LAYER_NAME))
@@ -212,7 +212,7 @@ class Test_layer_manager():
 
 
     @staticmethod
-    def test_add_multiple_of_planes_at_once_in_same_location(get_function_name, get_log, get_config, layer_manager_client, delete_db, mongodb_client, layer_manager_gw_client, get_status):
+    def test_scenario_add_multiple_of_planes_at_once_in_same_location(get_function_name, get_log, get_config, layer_manager_client, delete_db, mongodb_client, layer_manager_gw_client, get_status):
         new_layer_id, new_layer_name = create_and_validate_layer(layer_manager_client=layer_manager_client,
                                                                  get_log=get_log,
                                                                  layer_body=LayerRequest(name=LAYER_NAME))
@@ -236,7 +236,7 @@ class Test_layer_manager():
 
 
     @staticmethod
-    def test_add_plane_near_map_borders(get_function_name, get_log, get_config, layer_manager_client, delete_db, mongodb_client, layer_manager_gw_client, get_status):
+    def test_scenario_add_plane_near_map_borders(get_function_name, get_log, get_config, layer_manager_client, delete_db, mongodb_client, layer_manager_gw_client, get_status):
         new_layer_id, new_layer_name = create_and_validate_layer(layer_manager_client=layer_manager_client,
                                                                  get_log=get_log,
                                                                  layer_body=LayerRequest(name=LAYER_NAME))

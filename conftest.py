@@ -1,6 +1,7 @@
 import os
 import sys
 import time
+from os.path import join
 from urllib.parse import urljoin
 
 import pytest
@@ -8,8 +9,9 @@ import datetime
 import allure
 import requests
 
+from definitions import CONFIG_FOLDER
 from infra.RestUtils import improved_get, is_response_ok
-from infra.Utils import format_filename, str2bool
+from infra.Utils import format_filename, str2bool, read_from_json_config
 from ccst_config_reader import ConfigReader
 import logging
 from GrafanaSnapshot import SnapshotFace
@@ -46,7 +48,7 @@ def pytest_runtest_makereport(item, call):
 
 
 @pytest.fixture(scope="function", autouse=False)
-def get_function_name(request):
+def get_function_name(request) -> str:
     time = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
     function_name = format_filename(request.node.name) + "_" + time
 
@@ -54,7 +56,7 @@ def get_function_name(request):
 
 
 @pytest.fixture(scope='function', autouse=False)
-def get_log(get_function_name, logging_level=logging.DEBUG):
+def get_log(get_function_name, logging_level=logging.DEBUG) -> logging.Logger:
     time = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
     logger_name = get_function_name
 
@@ -72,20 +74,31 @@ def get_log(get_function_name, logging_level=logging.DEBUG):
     test_logger.info("ending logging for test for function {}".format(get_function_name))
 
 @pytest.fixture(scope="function", autouse=False)
-def get_config(get_log):
+def get_config(get_log) -> dict:
+    # if str2bool(os.environ['EXTERNAL']) == True:
+    #     config_file_name = "external_config.ini"
+    #     get_log.debug("running in external mode")
+    # else:
+    #     config_file_name = "config.ini"
+    #     get_log.debug("running in internal mode")
+    #
+    # project_config = ConfigReader.get_config(config_file_name=config_file_name)
+    #
+    # yield project_config
     if str2bool(os.environ['EXTERNAL']) == True:
-        config_file_name = "external_config.ini"
+        config_file_name = "external_config.json"
         get_log.debug("running in external mode")
     else:
-        config_file_name = "config.ini"
+        config_file_name = "config.json"
         get_log.debug("running in internal mode")
 
-    project_config = ConfigReader.get_config(config_file_name=config_file_name)
+    project_config = read_from_json_config(get_log, join(CONFIG_FOLDER, config_file_name))
 
     yield project_config
 
+
 @pytest.fixture(scope="function", autouse=False)
-def get_status(request, get_log):
+def get_status(request, get_log) -> None:
     get_log.info("*"*41 + 'TEST_BODY' + "*"*41)
     yield
     if request.node.rep_setup.failed:
@@ -99,7 +112,7 @@ def get_status(request, get_log):
     get_log.info("*"*39 + 'TEST_TEARDOWN' + "*"*39)
 
 @pytest.fixture(scope="function", autouse=False)
-def get_grafana_snapshot(request, get_function_name, get_config, get_log):
+def get_grafana_snapshot(request, get_function_name, get_config, get_log) -> None:
     epoc_time_from_start = round(time.time() * 1000)
 
     get_log.info("grafana metrics beginning at {}".format(time.ctime(time.time())))
@@ -131,7 +144,7 @@ def get_grafana_snapshot(request, get_function_name, get_config, get_log):
         allure.attach(name=get_function_name + "_grafana_metrics", extension=allure.attachment_type.URI_LIST, body=link)
 
 
-def set_warning_to_all_loggers_except(logger_name):
+def set_warning_to_all_loggers_except(logger_name) -> None:
     formatter = JsonFormatter(STRING_FORMAT)
     sh = logging.StreamHandler(stream=sys.stdout)
     for name in logging.root.manager.loggerDict:
@@ -142,14 +155,14 @@ def set_warning_to_all_loggers_except(logger_name):
             logger.setLevel(logging.WARNING)
 
 
-def check_connect_to_service(get_log, service_liveness_url):
+def check_connect_to_service(get_log, service_liveness_url) -> None:
     response = improved_get(log=get_log, url=service_liveness_url, params={})
 
     assert response.status_code == requests.codes.ok
 
 
 @pytest.fixture(scope="function", autouse=False)
-def layer_manager_client(get_log, get_config):
+def layer_manager_client(get_log, get_config) -> LayersManager:
     check_connect_to_service(get_log, service_liveness_url=get_config["SERVICES"]["layer_manager_server_livenss"])
 
     layer_manager_client = LayersManager(base_url=get_config["SERVICES"]["layer_rest_server_url"])
@@ -159,7 +172,7 @@ def layer_manager_client(get_log, get_config):
     layer_manager_client.close()
 
 @pytest.fixture(scope="function", autouse=False)
-def delete_db(layer_manager_client, get_log):
+def delete_db(layer_manager_client, get_log) -> None:
     # try:
     #     layers = layer_manager_client.layers.get()
     # except Exception as e:
@@ -198,9 +211,7 @@ def delete_db(layer_manager_client, get_log):
 
 
 
-
-
-def is_db_empty(mongodb_collection):
+def is_db_empty(mongodb_collection) -> bool:
     for doc in mongodb_collection.list_all_docs():
         return False
 
@@ -208,7 +219,7 @@ def is_db_empty(mongodb_collection):
 
 
 @pytest.fixture(scope="function", autouse=False)
-def mongodb_client(get_log, get_config):
+def mongodb_client(get_log, get_config) -> MyMongoCollection:
     mongodb_client = MyMongoClient(log=get_log, mongo_db_host_endpoint=get_config["SERVICES"]["layer_manager_mongo_db"],
                                  mongo_db_port=int(get_config["SERVICES"]["layer_manager_mongo_db_port"]))
 
@@ -224,7 +235,7 @@ def mongodb_client(get_log, get_config):
     mongodb_client.close()
 
 @pytest.fixture(scope="function", autouse=False)
-def mongodb_client_aircrafts(get_log, get_config):
+def mongodb_client_aircrafts(get_log, get_config) -> MyMongoCollection:
     mongodb_client = MyMongoClient(log=get_log, mongo_db_host_endpoint=get_config["SERVICES"]["layer_manager_mongo_db"],
                                  mongo_db_port=int(get_config["SERVICES"]["layer_manager_mongo_db_port"]))
 
@@ -240,10 +251,10 @@ def mongodb_client_aircrafts(get_log, get_config):
     mongodb_client.close()
 
 @pytest.fixture(scope="function", autouse=False)
-def layer_manager_gw_client(get_log, get_config):
+def layer_manager_gw_client(get_log, get_config) -> LayerManagerGWClient:
     check_connect_to_service(get_log=get_log, service_liveness_url=get_config["SERVICES"]["layer_manager_gw_livenss"])
 
-    layer_manager = LayerManagerGWClient(url=get_config["SERVICES"]["layer_manager_gw_url"], logger=get_log, headers=None)
+    layer_manager_gw = LayerManagerGWClient(url=get_config["SERVICES"]["layer_manager_gw_url"], logger=get_log, headers=None)
 
-    yield layer_manager
+    yield layer_manager_gw
 
