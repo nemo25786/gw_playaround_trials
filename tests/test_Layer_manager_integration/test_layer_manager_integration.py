@@ -116,7 +116,8 @@ class Test_layer_manager():
             validate_entity_creation_in_gw(layer_manager_gw_client, layer_id, new_entity_post_request[0].id, new_entity_post_request[0].name, get_log)
             validate_entity_creation_in_db(mongodb_client_aircrafts, get_log, entity_id=new_entity_post_request[0].id, entity_name=new_entity_name)
 
-
+@pytest.mark.e2e
+class Test_scenaios(object):
     @staticmethod
     def test_scenario_add_random_entities(get_function_name, get_log, get_config, layer_manager_client, delete_db, mongodb_client, layer_manager_gw_client, get_status):
         new_layer = LayerRequest(name=LAYER_NAME)

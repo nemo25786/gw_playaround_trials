@@ -146,15 +146,15 @@ class Test_entity_resource(object):
 
         assert "longitude/latitude is out of bounds" in entity_response_post.message, get_log.error("entity with illegal coordinates allowed - latitue")
 
-        # new_entity = EntityRequest(layer_id=response_post.id, name="trial_entity", type="trial", geo_data=Feature(geometry=Point(coordinates=[1.3, 2]), properties={"someprop": "somevalue"}))
-        # entity_response_post = layer_manager_client.layers.layer_id_entities_post(layer_id=response_post.id,
-        #                                                                           body=[new_entity])
-        # assert len(entity_response_post) == 1 and entity_response_post[0].name == new_entity.name, get_log.error("duplicate entity name allowed in single add")
-        #
-        # new_entity = EntityRequest(layer_id=response_post.id, name="trial_entity", type="trial", geo_data=Feature(geometry=Point(coordinates=[0, 0]), properties={"someprop": "somevalue"}))
-        # entity_response_post = layer_manager_client.layers.layer_id_entities_post(layer_id=response_post.id, body=[new_entity, new_entity])
-        #
-        # assert len(entity_response_post) == 1 and entity_response_post[0].name == new_entity.name, get_log.error("duplicate entity name allowed in batch add")
+        new_entity = EntityRequest(layer_id=response_post.id, name="trial_entity", type="trial", geo_data=Feature(geometry=Point(coordinates=[1.3, 2]), properties={"someprop": "somevalue"}))
+        entity_response_post = layer_manager_client.layers.layer_id_entities_post(layer_id=response_post.id,
+                                                                                  body=[new_entity])
+        assert len(entity_response_post) == 1 and entity_response_post[0].name == new_entity.name, get_log.error("duplicate entity name allowed in single add")
+
+        new_entity = EntityRequest(layer_id=response_post.id, name="trial_entity", type="trial", geo_data=Feature(geometry=Point(coordinates=[0, 0]), properties={"someprop": "somevalue"}))
+        entity_response_post = layer_manager_client.layers.layer_id_entities_post(layer_id=response_post.id, body=[new_entity, new_entity])
+
+        assert len(entity_response_post) == 1 and entity_response_post[0].name == new_entity.name, get_log.error("duplicate entity name allowed in batch add")
 
     @staticmethod
     def test_delete_entity_from_layer(get_function_name, get_log, get_config, layer_manager_client, delete_db, get_status):

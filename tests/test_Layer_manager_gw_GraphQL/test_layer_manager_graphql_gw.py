@@ -26,7 +26,7 @@ class Test_gw():
 
     @pytest.mark.xfail
     @staticmethod
-    def test_get_layers_feature_collection_no_query(get_function_name, get_log, get_config, layer_manager_gw_client, get_status):
+    def test_get_layers_feature_collection(get_function_name, get_log, get_config, layer_manager_gw_client, get_status):
         layer_list = layer_manager_gw_client.get_layers_as_feature_collection()
 
         for layer in layer_list:
