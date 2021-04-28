@@ -31,7 +31,7 @@
     "grafana_internal_port": "32300",
     "layer_manager_gw_url": "http://10.53.164.41:31155/graphql",
     "layer_manager_gw_livenss": "http://10.53.164.41:31155/.well-known/apollo/server-health/",
-    "layer_rest_server_url": "http://localhost:3000/api/v1",
+    "layer_rest_server_url": "http://10.53.164.41:31156/api/v1",
     "layer_manager_server_livenss": "http://10.53.164.41:31156/liveness",
     "allure_report_address": "http://10.53.164.41:31969",
     "layer_server_url": "http://localhost:3005",

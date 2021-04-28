@@ -2,7 +2,6 @@ import os
 import sys
 import time
 from os.path import join
-from urllib.parse import urljoin
 
 import pytest
 import datetime
@@ -10,9 +9,8 @@ import allure
 import requests
 
 from definitions import CONFIG_FOLDER
-from infra.RestUtils import improved_get, is_response_ok
+from infra.RestUtils import improved_get
 from infra.Utils import format_filename, str2bool, read_from_json_config
-from ccst_config_reader import ConfigReader
 import logging
 from GrafanaSnapshot import SnapshotFace
 from jsonformatter import JsonFormatter
@@ -74,7 +72,7 @@ def get_log(get_function_name, logging_level=logging.DEBUG) -> logging.Logger:
     test_logger.info("ending logging for test for function {}".format(get_function_name))
 
 @pytest.fixture(scope="function", autouse=False)
-def get_config(get_log) -> dict:
+def get_config(get_log: logging.Logger) -> dict:
     # if str2bool(os.environ['EXTERNAL']) == True:
     #     config_file_name = "external_config.ini"
     #     get_log.debug("running in external mode")
